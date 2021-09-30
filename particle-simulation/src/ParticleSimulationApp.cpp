@@ -1,5 +1,7 @@
 #include "ParticleSimulationApp.h"
 
+#include <OgreCameraMan.h>
+
 ParticleSimulationApp::ParticleSimulationApp()
 	: OgreBites::ApplicationContext("ParticleSimulationApp")
 {
@@ -41,10 +43,16 @@ void ParticleSimulationApp::SetupCamera(Ogre::SceneManager* sceneManager)
     Ogre::Camera *camera = sceneManager->createCamera("Camera");
     camera->setNearClipDistance(5);
     camera->setAutoAspectRatio(true);
+
     Ogre::SceneNode *cameraNode = sceneManager->getRootSceneNode()->createChildSceneNode();
     cameraNode->setPosition(0, 0, 15);
     cameraNode->lookAt(Ogre::Vector3(0, 0, -1), Ogre::Node::TS_PARENT);
     cameraNode->attachObject(camera);
+
+    OgreBites::CameraMan *cameraMan = new OgreBites::CameraMan(cameraNode);
+    cameraMan->setStyle(OgreBites::CS_FREELOOK);
+    cameraMan->setTopSpeed(10.0f);
+    addInputListener(cameraMan);
 
     getRenderWindow()->addViewport(camera);
 }
