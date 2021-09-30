@@ -4,20 +4,30 @@
 
 ParticleSimulationApp::ParticleSimulationApp()
 	: OgreBites::ApplicationContext("ParticleSimulationApp")
+    , m_ParticleSystem()
 {
 }
 
+// TODO: Correctly delete al resources that are generated
 void ParticleSimulationApp::setup()
 {
     OgreBites::ApplicationContext::setup();
     addInputListener(this);
 
-    Ogre::SceneManager *sceneManager = getRoot()->createSceneManager();
+    m_SceneManager = getRoot()->createSceneManager();
     Ogre::RTShader::ShaderGenerator* shaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
-    shaderGenerator->addSceneManager(sceneManager);
-    SetupLighting(sceneManager);
-    SetupCamera(sceneManager);
-    SetupMeshes(sceneManager);
+    shaderGenerator->addSceneManager(m_SceneManager);
+    SetupLighting();
+    SetupCamera();
+    SetupMeshes();
+}
+
+void ParticleSimulationApp::shutdown()
+{
+    OgreBites::ApplicationContext::shutdown();
+    m_SceneManager->destroyLight(m_Light);
+    m_SceneManager->destroyCamera(m_Camera);
+    m_SceneManager->destroyEntity(m_Sinbad);
 }
 
 bool ParticleSimulationApp::keyPressed(const OgreBites::KeyboardEvent& event)
@@ -26,40 +36,47 @@ bool ParticleSimulationApp::keyPressed(const OgreBites::KeyboardEvent& event)
 	else return true;
 }
 
-void ParticleSimulationApp::SetupLighting(Ogre::SceneManager* sceneManager)
+bool ParticleSimulationApp::frameEnded(const Ogre::FrameEvent& event)
 {
-    sceneManager->setAmbientLight(Ogre::ColourValue(0.1f, 0.1f, 0.1f));
-
-    Ogre::Light *light = sceneManager->createLight("Light");
-    light->setDiffuseColour(Ogre::ColourValue(0.5f, 0.5f, 0.5f));
-    light->setSpecularColour(Ogre::ColourValue(0.5f, 0.5f, 0.5f));
-    Ogre::SceneNode *lightNode = sceneManager->getRootSceneNode()->createChildSceneNode();
-    lightNode->setPosition(0, 10, 15);
-    lightNode->attachObject(light);
+    m_ParticleSystem.Update(event.timeSinceLastFrame);
+    m_SceneManager->getSceneNode("Sinbad")->setPosition(m_ParticleSystem.GetParticlePosition()); // TODO: Manage better SceneNode's so no lookups have to be done
+    return true;
 }
 
-void ParticleSimulationApp::SetupCamera(Ogre::SceneManager* sceneManager)
+void ParticleSimulationApp::SetupLighting()
 {
-    Ogre::Camera *camera = sceneManager->createCamera("Camera");
-    camera->setNearClipDistance(5);
-    camera->setAutoAspectRatio(true);
+    m_SceneManager->setAmbientLight(Ogre::ColourValue(0.1f, 0.1f, 0.1f));
 
-    Ogre::SceneNode *cameraNode = sceneManager->getRootSceneNode()->createChildSceneNode();
+    m_Light = m_SceneManager->createLight("Light");
+    m_Light->setDiffuseColour(Ogre::ColourValue(0.5f, 0.5f, 0.5f));
+    m_Light->setSpecularColour(Ogre::ColourValue(0.5f, 0.5f, 0.5f));
+    Ogre::SceneNode *lightNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
+    lightNode->setPosition(0, 10, 15);
+    lightNode->attachObject(m_Light);
+}
+
+void ParticleSimulationApp::SetupCamera()
+{
+    m_Camera = m_SceneManager->createCamera("Camera");
+    m_Camera->setNearClipDistance(5);
+    m_Camera->setAutoAspectRatio(true);
+
+    Ogre::SceneNode *cameraNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
     cameraNode->setPosition(0, 0, 15);
     cameraNode->lookAt(Ogre::Vector3(0, 0, -1), Ogre::Node::TS_PARENT);
-    cameraNode->attachObject(camera);
+    cameraNode->attachObject(m_Camera);
 
     OgreBites::CameraMan *cameraMan = new OgreBites::CameraMan(cameraNode);
     cameraMan->setStyle(OgreBites::CS_FREELOOK);
     cameraMan->setTopSpeed(10.0f);
     addInputListener(cameraMan);
 
-    getRenderWindow()->addViewport(camera);
+    getRenderWindow()->addViewport(m_Camera);
 }
 
-void ParticleSimulationApp::SetupMeshes(Ogre::SceneManager* sceneManager)
+void ParticleSimulationApp::SetupMeshes()
 {
-    Ogre::Entity *sinbad = sceneManager->createEntity("Sinbad.mesh");
-    Ogre::SceneNode *sinbadNode = sceneManager->getRootSceneNode()->createChildSceneNode();
-    sinbadNode->attachObject(sinbad);
+    m_Sinbad = m_SceneManager->createEntity("Sinbad.mesh");
+    Ogre::SceneNode *sinbadNode = m_SceneManager->getRootSceneNode()->createChildSceneNode("Sinbad");
+    sinbadNode->attachObject(m_Sinbad);
 }
