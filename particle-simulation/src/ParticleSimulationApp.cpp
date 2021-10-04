@@ -36,10 +36,18 @@ bool ParticleSimulationApp::keyPressed(const OgreBites::KeyboardEvent& event)
 	else return true;
 }
 
+bool ParticleSimulationApp::frameStarted(const Ogre::FrameEvent& event)
+{
+    // TODO: Update scene based on the data from m_ParticleSystem
+    OgreBites::ApplicationContext::frameStarted(event);
+    m_SceneManager->getSceneNode("Sinbad")->setPosition(m_ParticleSystem.GetParticlePosition()); // TODO: Manage better SceneNode's so no lookups have to be done
+    return true;
+}
+
 bool ParticleSimulationApp::frameEnded(const Ogre::FrameEvent& event)
 {
+    OgreBites::ApplicationContext::frameEnded(event);
     m_ParticleSystem.Update(event.timeSinceLastFrame);
-    m_SceneManager->getSceneNode("Sinbad")->setPosition(m_ParticleSystem.GetParticlePosition()); // TODO: Manage better SceneNode's so no lookups have to be done
     return true;
 }
 

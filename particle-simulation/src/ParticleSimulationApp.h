@@ -14,6 +14,7 @@ public:
 	void setup() override;
 	void shutdown() override;
 	bool keyPressed(const OgreBites::KeyboardEvent& event) override;
+	bool frameStarted(const Ogre::FrameEvent& event) override;
 	bool frameEnded(const Ogre::FrameEvent& event) override;
 private:
 	void SetupLighting();
