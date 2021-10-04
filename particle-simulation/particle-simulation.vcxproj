@@ -159,11 +159,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Particle.cpp" />
     <ClCompile Include="src\ParticleSystem.cpp" />
     <ClCompile Include="src\ParticleSimulationApp.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Particle.h" />
     <ClInclude Include="src\ParticleSystem.h" />
     <ClInclude Include="src\ParticleSimulationApp.h" />
     <ClInclude Include="src\Plane.h" />

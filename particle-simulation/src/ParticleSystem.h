@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Particle.h"
+
 #include <OgreVector3.h>
 
 class ParticleSystem
@@ -8,17 +10,9 @@ class ParticleSystem
 public:
 	ParticleSystem();
 	ParticleSystem(const Vector3 &particlePosition);
-	Vector3 GetParticlePosition() { return m_CurrentParticlePosition; }
-	void Update(float timeStep);
+	Vector3 GetParticlePosition() { return m_Particle.GetPosition(); }
+	void Update(float dt);
 private:
-	Vector3 ComputeForce();
-	bool PlaneCollision();
-	void ResolvePlaneCollision();
-private:
-	Vector3 m_CurrentParticlePosition; // TODO: Add more particles
-	Vector3 m_PreviousParticlePosition;
-	Vector3 m_ParticleVelocity;
-	Vector3 m_Gravity;
-	float m_ParticleMass;
+	Particle m_Particle; // TODO: Add MORE particles
 };
 
