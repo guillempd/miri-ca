@@ -19,5 +19,7 @@ private:
 	Vector3 m_PreviousPosition;
 	Vector3 m_CurrentVelocity;
 	float m_Mass;
+	float m_BouncingCoefficient;
+	float m_FrictionCoefficient;
 };
 

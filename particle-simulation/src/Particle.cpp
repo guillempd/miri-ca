@@ -11,8 +11,10 @@ Particle::Particle()
 Particle::Particle(const Vector3 &initialPosition)
 	: m_CurrentPosition(initialPosition)
 	, m_PreviousPosition(initialPosition) // TODO: Correctly initialize for Verlet solver
-	, m_CurrentVelocity(0.0f, 0.0f, 0.0f)
+	, m_CurrentVelocity(5.0f, 0.0f, 0.0f)
 	, m_Mass(1.0f)
+	, m_BouncingCoefficient(0.5f)
+	, m_FrictionCoefficient(0.5f)
 {}
 
 // TODO: Add more solvers
@@ -40,8 +42,13 @@ bool Particle::PlaneCollision()
 void Particle::ResolvePlaneCollision()
 {
 	Plane floor = { Vector3(0.0f, 1.0f, 0.0f), 0.0f };
-	m_CurrentPosition = m_CurrentPosition - 2 * (floor.offset + floor.normal.dotProduct(m_CurrentPosition)) * floor.normal;
-	m_CurrentVelocity = m_CurrentVelocity - 2 * floor.normal.dotProduct(m_CurrentVelocity) * floor.normal;
+
+	m_CurrentPosition = m_CurrentPosition - (1 + m_BouncingCoefficient) * (floor.offset + floor.normal.dotProduct(m_CurrentPosition)) * floor.normal;
+	m_CurrentVelocity = m_CurrentVelocity - (1 + m_BouncingCoefficient) * floor.normal.dotProduct(m_CurrentVelocity) * floor.normal;
+
+	Vector3 normalVelocity = floor.normal.dotProduct(m_CurrentVelocity) * floor.normal;
+	Vector3 tangentVelocity = m_CurrentVelocity - normalVelocity;
+	m_CurrentVelocity -= m_FrictionCoefficient * tangentVelocity;
 }
 
 Vector3 Particle::CurrentForce()
