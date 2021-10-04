@@ -4,7 +4,7 @@ ParticleSystem::ParticleSystem()
 {
 }
 
-ParticleSystem::ParticleSystem(const Ogre::Vector3& particlePosition)
+ParticleSystem::ParticleSystem(const Vector3& particlePosition)
 	: m_ParticlePosition(particlePosition)
 {
 }
@@ -12,5 +12,5 @@ ParticleSystem::ParticleSystem(const Ogre::Vector3& particlePosition)
 // TODO: Correctly implement this update
 void ParticleSystem::Update(float timeStep)
 {
-	m_ParticlePosition += Ogre::Vector3(-0.01f, 0.0f, 0.0f) * timeStep;
+	m_ParticlePosition += Vector3(-0.1f, 0.0f, 0.0f) * timeStep;
 }
