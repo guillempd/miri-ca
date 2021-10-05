@@ -32,8 +32,12 @@ void ParticleSimulationApp::shutdown()
 
 bool ParticleSimulationApp::keyPressed(const OgreBites::KeyboardEvent& event)
 {
-	if (event.keysym.sym == OgreBites::SDLK_ESCAPE) getRoot()->queueEndRendering();
-	else return true;
+    if (event.keysym.sym == OgreBites::SDLK_ESCAPE)
+    {
+        getRoot()->queueEndRendering();
+        return true;
+    }
+	else return false;
 }
 
 bool ParticleSimulationApp::frameStarted(const Ogre::FrameEvent& event)
