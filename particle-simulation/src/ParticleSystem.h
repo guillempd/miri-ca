@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Particle.h"
+#include "Plane.h"
 
 #include <Ogre.h>
 
@@ -13,6 +14,8 @@ public:
 	Vector3 GetParticlePosition() { return m_Particle.GetPosition(); }
 	void Update(float dt);
 private:
-	Particle m_Particle; // TODO: Add MORE particles
+	// TODO: Add MORE of these
+	Particle m_Particle;
+	Plane m_Plane;
 };
 

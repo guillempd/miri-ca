@@ -1,7 +1,5 @@
 #include "Particle.h"
 
-#include "Plane.h"
-
 using Ogre::Vector3;
 
 Particle::Particle()
@@ -25,28 +23,19 @@ void Particle::Update(float dt)
 	Vector3 currentAcceleration = CurrentForce() / m_Mass;
 	m_CurrentPosition += m_CurrentVelocity * dt;
 	m_CurrentVelocity += currentAcceleration * dt;
-
-	if (PlaneCollision()) ResolvePlaneCollision();
 }
 
-
-bool Particle::PlaneCollision()
+void Particle::CheckAndResolveCollision(const Plane& plane)
 {
-	Plane floor = { Vector3(0.0f, 1.0f, 0.0f), 0.0f };
+	float previousSign = plane.normal.dotProduct(m_PreviousPosition) + plane.offset; // TODO: Consider refactoring this computation into a Plane function
+	float currentSign = plane.normal.dotProduct(m_CurrentPosition) + plane.offset;
+	bool collision = previousSign * currentSign < 0;
+	if (!collision) return;
 
-	float previousSign = floor.normal.dotProduct(m_PreviousPosition) + floor.offset; // TODO: Consider refactoring this computation into a Plane function
-	float currentSign = floor.normal.dotProduct(m_CurrentPosition) + floor.offset;
-	return previousSign * currentSign < 0;
-}
+	m_CurrentPosition = m_CurrentPosition - (1 + m_BouncingCoefficient) * (plane.offset + plane.normal.dotProduct(m_CurrentPosition)) * plane.normal;
+	m_CurrentVelocity = m_CurrentVelocity - (1 + m_BouncingCoefficient) * plane.normal.dotProduct(m_CurrentVelocity) * plane.normal;
 
-void Particle::ResolvePlaneCollision()
-{
-	Plane floor = { Vector3(0.0f, 1.0f, 0.0f), 0.0f };
-
-	m_CurrentPosition = m_CurrentPosition - (1 + m_BouncingCoefficient) * (floor.offset + floor.normal.dotProduct(m_CurrentPosition)) * floor.normal;
-	m_CurrentVelocity = m_CurrentVelocity - (1 + m_BouncingCoefficient) * floor.normal.dotProduct(m_CurrentVelocity) * floor.normal;
-
-	Vector3 normalVelocity = floor.normal.dotProduct(m_CurrentVelocity) * floor.normal;
+	Vector3 normalVelocity = plane.normal.dotProduct(m_CurrentVelocity) * plane.normal;
 	Vector3 tangentVelocity = m_CurrentVelocity - normalVelocity;
 	m_CurrentVelocity -= m_FrictionCoefficient * tangentVelocity;
 }

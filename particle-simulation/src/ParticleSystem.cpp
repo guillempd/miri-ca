@@ -11,11 +11,12 @@ ParticleSystem::ParticleSystem()
 
 ParticleSystem::ParticleSystem(const Vector3& particlePosition)
 	: m_Particle(particlePosition)
+	, m_Plane{Vector3(0.0f, 1.0f, 0.0f), 0.0f}
 {
 }
 
-// TODO: Move the checking of collision with elements of the scene here (?)
 void ParticleSystem::Update(float dt)
 {
 	m_Particle.Update(dt);
+	m_Particle.CheckAndResolveCollision(m_Plane);
 }

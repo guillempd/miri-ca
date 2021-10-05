@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Plane.h"
+
 #include <Ogre.h>
 
 class Particle
@@ -9,10 +11,9 @@ public:
 	Particle();
 	Particle(const Vector3 &initialPosition);
 	void Update(float dt);
-	Vector3 GetPosition() { return m_CurrentPosition; };
+	const Vector3 &GetPosition() const { return m_CurrentPosition; };
+	void CheckAndResolveCollision(const Plane &plane);
 private:
-	bool PlaneCollision();
-	void ResolvePlaneCollision(); // TODO: Consider merging this and the previous function into one
 	Vector3 CurrentForce();
 private:
 	Vector3 m_CurrentPosition;
