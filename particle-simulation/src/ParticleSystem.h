@@ -2,7 +2,7 @@
 
 #include "Particle.h"
 
-#include <OgreVector3.h>
+#include <Ogre.h>
 
 class ParticleSystem
 {
