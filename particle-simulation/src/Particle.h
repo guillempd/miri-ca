@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Plane.h"
+#include "Sphere.h"
 
 #include <Ogre.h>
 
@@ -13,8 +14,11 @@ public:
 	void Update(float dt);
 	const Vector3 &GetPosition() const { return m_CurrentPosition; };
 	void CheckAndResolveCollision(const Plane &plane);
+	void CheckAndResolveCollision(const Sphere &sphere);
 private:
 	Vector3 CurrentForce();
+	bool CheckCollision(const Plane& plane);
+	void ResolveCollision(const Plane &plane);
 private:
 	Vector3 m_CurrentPosition;
 	Vector3 m_PreviousPosition;

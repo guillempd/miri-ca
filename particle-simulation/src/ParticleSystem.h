@@ -2,6 +2,7 @@
 
 #include "Particle.h"
 #include "Plane.h"
+#include "Sphere.h"
 
 #include <Ogre.h>
 
@@ -17,5 +18,6 @@ private:
 	// TODO: Add MORE of these
 	Particle m_Particle;
 	Plane m_Plane;
+	Sphere m_Sphere;
 };
 
