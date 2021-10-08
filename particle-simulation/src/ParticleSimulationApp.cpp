@@ -1,6 +1,14 @@
 #include "ParticleSimulationApp.h"
 
-#include <OgreCameraMan.h>
+#include <Ogre.h>
+#include <OgreOverlay.h>
+#include <OgreOverlaySystem.h>
+#include <OgreOverlayManager.h>
+#include <OgreImGuiOverlay.h>
+
+#include <vector>
+
+// TODO: Cleanup this includes
 
 ParticleSimulationApp::ParticleSimulationApp()
 	: OgreBites::ApplicationContext("ParticleSimulationApp")
@@ -12,7 +20,6 @@ ParticleSimulationApp::ParticleSimulationApp()
 void ParticleSimulationApp::setup()
 {
     OgreBites::ApplicationContext::setup();
-    addInputListener(this);
 
     m_SceneManager = getRoot()->createSceneManager();
     Ogre::RTShader::ShaderGenerator* shaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
@@ -20,6 +27,12 @@ void ParticleSimulationApp::setup()
     SetupLighting();
     SetupCamera();
     SetupMeshes();
+
+    CreateOverlay();
+
+    std::vector<InputListener*> chain = {m_ImGui, this, m_CameraMan};
+    OgreBites::InputListenerChain *inputListenerChain = new OgreBites::InputListenerChain(chain);
+    addInputListener(inputListenerChain);
 }
 
 void ParticleSimulationApp::shutdown()
@@ -45,6 +58,9 @@ bool ParticleSimulationApp::frameStarted(const Ogre::FrameEvent& event)
     // TODO: Update scene based on the data from m_ParticleSystem
     OgreBites::ApplicationContext::frameStarted(event);
     m_SceneManager->getSceneNode("Sinbad")->setPosition(m_ParticleSystem.GetParticlePosition()); // TODO: Manage better SceneNode's so no lookups have to be done
+
+    Ogre::ImGuiOverlay::NewFrame();
+    ImGui::ShowDemoWindow();
     return true;
 }
 
@@ -52,6 +68,9 @@ bool ParticleSimulationApp::frameEnded(const Ogre::FrameEvent& event)
 {
     OgreBites::ApplicationContext::frameEnded(event);
     m_ParticleSystem.Update(event.timeSinceLastFrame);
+
+    ImGui::EndFrame();
+
     return true;
 }
 
@@ -78,10 +97,10 @@ void ParticleSimulationApp::SetupCamera()
     cameraNode->lookAt(Ogre::Vector3(0, 0, -1), Ogre::Node::TS_PARENT);
     cameraNode->attachObject(m_Camera);
 
-    OgreBites::CameraMan *cameraMan = new OgreBites::CameraMan(cameraNode);
-    cameraMan->setStyle(OgreBites::CS_FREELOOK);
-    cameraMan->setTopSpeed(10.0f);
-    addInputListener(cameraMan);
+    m_CameraMan = new OgreBites::CameraMan(cameraNode);
+    m_CameraMan->setStyle(OgreBites::CS_ORBIT);
+    m_CameraMan->setTarget(m_SceneManager->getRootSceneNode());
+    m_CameraMan->setTopSpeed(10.0f);
 
     getRenderWindow()->addViewport(m_Camera);
 }
@@ -91,4 +110,17 @@ void ParticleSimulationApp::SetupMeshes()
     m_Sinbad = m_SceneManager->createEntity("Sinbad.mesh");
     Ogre::SceneNode *sinbadNode = m_SceneManager->getRootSceneNode()->createChildSceneNode("Sinbad");
     sinbadNode->attachObject(m_Sinbad);
+}
+
+void ParticleSimulationApp::CreateOverlay()
+{
+    // Add the overlay system to listen for render events
+    Ogre::OverlaySystem *overlaySystem = getOverlaySystem();
+    m_SceneManager->addRenderQueueListener(overlaySystem);
+
+    Ogre::ImGuiOverlay* imguiOverlay = new Ogre::ImGuiOverlay();
+    Ogre::OverlayManager::getSingletonPtr()->addOverlay(imguiOverlay);
+    imguiOverlay->show();
+
+    m_ImGui = new OgreBites::ImGuiInputListener();
 }
