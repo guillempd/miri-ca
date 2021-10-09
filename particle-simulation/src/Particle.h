@@ -9,9 +9,11 @@ class Particle
 {
 	using Vector3 = Ogre::Vector3;
 public:
+	enum class SolverMethod {Euler, EulerSemi, Verlet};
+public:
 	Particle();
 	Particle(const Vector3 &initialPosition);
-	void Update(float dt);
+	void Update(float dt, SolverMethod method);
 	const Vector3 &GetPosition() const { return m_CurrentPosition; };
 	void CheckAndResolveCollision(const Plane &plane);
 	void CheckAndResolveCollision(const Sphere &sphere);

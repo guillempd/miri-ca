@@ -11,18 +11,36 @@ Particle::Particle(const Vector3 &initialPosition)
 	, m_PreviousPosition(initialPosition) // TODO: Correctly initialize for Verlet solver
 	, m_CurrentVelocity(0.0f, 0.0f, 0.0f)
 	, m_Mass(1.0f)
-	, m_BouncingCoefficient(0.5f)
+	, m_BouncingCoefficient(1.0f)
 	, m_FrictionCoefficient(0.5f)
 {}
 
 // TODO: Add more solvers
-void Particle::Update(float dt)
+void Particle::Update(float dt, SolverMethod method)
 {
-	m_PreviousPosition = m_CurrentPosition;
-
 	Vector3 currentAcceleration = CurrentForce() / m_Mass;
-	m_CurrentPosition += m_CurrentVelocity * dt;
-	m_CurrentVelocity += currentAcceleration * dt;
+	switch (method)
+	{
+	case SolverMethod::Euler:
+	{
+		m_PreviousPosition = m_CurrentPosition;
+		m_CurrentPosition += m_CurrentVelocity * dt;
+		m_CurrentVelocity += currentAcceleration * dt;
+	} break;
+	case SolverMethod::EulerSemi:
+	{
+		m_PreviousPosition = m_CurrentPosition;
+		m_CurrentVelocity += currentAcceleration * dt;
+		m_CurrentPosition += m_CurrentVelocity * dt;
+	} break;
+	case SolverMethod::Verlet:
+	{
+		OgreAssert(false);
+		/*m_CurrentVelocity = m_CurrentPosition - m_PreviousPosition;
+		m_PreviousPosition = m_CurrentPosition;
+		m_CurrentPosition += m_CurrentVelocity;*/ // No need for timestep since it is already taken into account
+	} break;
+	}
 }
 
 void Particle::CheckAndResolveCollision(const Plane& plane)

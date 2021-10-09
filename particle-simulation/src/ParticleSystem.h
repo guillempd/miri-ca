@@ -19,5 +19,6 @@ private:
 	Particle m_Particle;
 	Plane m_Plane;
 	Sphere m_Sphere;
+	Particle::SolverMethod m_SolverMethod;
 };
 
