@@ -57,7 +57,6 @@ bool ParticleSimulationApp::frameStarted(const Ogre::FrameEvent& event)
     OgreBites::ApplicationContext::frameStarted(event);
     Ogre::ImGuiOverlay::NewFrame();
     m_Scene.Update(event.timeSinceLastFrame);
-    // m_SceneManager->getSceneNode("Sinbad")->setPosition(m_Scene.GetParticlePosition());
     return true; // TODO: What should this return value be (?)
 }
 

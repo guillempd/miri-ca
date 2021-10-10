@@ -8,6 +8,10 @@ Scene::Scene()
 	: m_Particles()
 	, m_Plane(Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 0.0f, 0.0f)) // Floor
 	, m_Sphere{Vector3(0.0f, 0.0f, 0.0f), 3.0f}
+	, m_NumParticles(10)
+	, m_NumActiveParticles(0)
+	, m_Lifetime(5.0f)
+	, m_ElapsedTime(0.0f)
 {
 }
 
@@ -53,16 +57,15 @@ void Scene::SetupCamera(Ogre::RenderWindow* renderWindow)
 
 void Scene::SetupEntities()
 {
-	int numParticles = 10;
-	m_Particles.reserve(numParticles);
-	for (int i = 0; i < numParticles; ++i)
+	m_Particles.reserve(m_NumParticles);
+	for (int i = 0; i < m_NumParticles; ++i)
 	{
 		Ogre::Entity* particleEntity = m_SceneManager->createEntity("sphere.mesh");
 		particleEntity->setMaterial(Ogre::MaterialManager::getSingleton().getDefaultMaterial());
 
 		Ogre::SceneNode* particleEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode(); // TODO: Name these (?)
 		particleEntityNode->attachObject(particleEntity);
-		particleEntityNode->setScale(0.01f, 0.01f, 0.01f);
+		particleEntityNode->setScale(0.001f, 0.001f, 0.001f);
 
 		m_Particles.emplace_back(particleEntityNode);
 	}
@@ -87,9 +90,22 @@ void Scene::Update(float dt)
 	}
 	ImGui::End();
 
-	for (Particle& particle : m_Particles)
+	// Update numActiveParticles, for now assume the lifetime is fixed
+	m_ElapsedTime += dt;
+	m_NumActiveParticles = m_NumParticles * (m_ElapsedTime / m_Lifetime);
+	m_NumActiveParticles = (m_NumActiveParticles <= m_NumParticles ? m_NumActiveParticles : m_NumParticles);
+
+	for (int i = 0; i < m_NumActiveParticles; ++i)
 	{
-		particle.Update(dt, m_SolverMethod);
+		Particle& particle = m_Particles[i];
+
+		float actualDt = particle.UpdateLifetime(dt);
+		if (actualDt <= 0.0f)
+		{
+			actualDt = -actualDt;
+			particle.Reset(Particle::GenerationType::Cascade, m_Lifetime);
+		}
+		particle.UpdatePosition(actualDt, m_SolverMethod);
 		particle.CheckAndResolveCollision(m_Plane);
 		particle.CheckAndResolveCollision(m_Sphere);
 	}

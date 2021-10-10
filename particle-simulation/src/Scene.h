@@ -15,7 +15,6 @@ class Scene
 public:
 	Scene();
 	~Scene();
-	//void Reset();
 	void Setup(Ogre::SceneManager* sceneManager, Ogre::RenderWindow* renderWindow);
 	void Update(float dt);
 	OgreBites::CameraMan* GetCameraMan() { return m_CameraMan; }
@@ -27,6 +26,10 @@ private:
 	std::vector<Particle> m_Particles;
 	Plane m_Plane;
 	Sphere m_Sphere;
+	int m_NumParticles;
+	int m_NumActiveParticles;
+	float m_Lifetime;
+	float m_ElapsedTime;
 	Ogre::SceneManager* m_SceneManager;
 	OgreBites::CameraMan* m_CameraMan;
 	Particle::SolverMethod m_SolverMethod;

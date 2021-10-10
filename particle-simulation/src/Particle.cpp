@@ -2,35 +2,46 @@
 
 using Ogre::Vector3;
 
-Particle::Particle(Ogre::SceneNode* sceneNode)
+Particle::Particle(Ogre::SceneNode* sceneNode) // TODO: Pass in a GenerationType
 	: m_SceneNode(sceneNode)
 {
-	Reset();
+	m_LifetimeLeft = 0.0f;
+	m_SceneNode->setVisible(false);
 }
 
-void Particle::Reset(const Vector3& initialPosition)
+// TODO: Randomize
+void Particle::Reset(GenerationType generationType, float lifetime)
 {
-	m_CurrentPosition = initialPosition;
-	m_PreviousPosition = initialPosition; // TODO: Correctly initialize for Verlet solver
-	m_CurrentVelocity = Vector3(0.0f, 0.0f, 0.0f);
+	m_SceneNode->setVisible(true);
 	m_Mass = 1.0f;
 	m_BouncingCoefficient = 1.0f;
 	m_FrictionCoefficient = 0.5f;
-	m_Lifetime = 5.0f;
-	m_LifetimeLeft = 5.0f;
+	m_LifetimeLeft += lifetime; // So it takes into account the small part of lifetime it had left
+	switch (generationType)
+	{
+	case GenerationType::Cascade:
+	{
+		m_CurrentPosition = Vector3(0.0f, 10.0f, 0.0f);
+		m_CurrentVelocity = Vector3(0.0f, 0.0f, 0.0f);
+	} break;
+	case GenerationType::Fountain:
+	{
+		m_CurrentPosition = Vector3(0.0f, 0.0f, 0.0f);
+		m_CurrentVelocity = Vector3(0.0f, 10.0f, 0.0f);
+	} break;
+	}
+	m_PreviousPosition = m_CurrentPosition; // TODO: Correctly initialize for Verlet solver
 }
 
-// TODO: Add more solvers
-void Particle::Update(float dt, SolverMethod method)
+float Particle::UpdateLifetime(float dt)
 {
 	m_LifetimeLeft -= dt;
-	if (m_LifetimeLeft <= 0.0f)
-	{
-		dt = -m_LifetimeLeft;
-		m_LifetimeLeft += m_Lifetime;
-		Reset();
-	}
+	if (m_LifetimeLeft <= 0.0f) dt = m_LifetimeLeft;
+	return dt;
+}
 
+void Particle::UpdatePosition(float dt, SolverMethod method)
+{
 	Vector3 currentAcceleration = CurrentForce() / m_Mass;
 	switch (method)
 	{
