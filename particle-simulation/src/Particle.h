@@ -11,8 +11,8 @@ class Particle
 public:
 	enum class SolverMethod {Euler, EulerSemi, Verlet};
 public:
-	Particle();
-	Particle(const Vector3 &initialPosition);
+	Particle(Ogre::SceneNode* sceneNode);
+	void Reset(const Vector3& intialNode = Vector3(0.0f, 0.0f, 0.0f));
 	void Update(float dt, SolverMethod method);
 	const Vector3 &GetPosition() const { return m_CurrentPosition; };
 	void CheckAndResolveCollision(const Plane &plane);
@@ -21,12 +21,16 @@ private:
 	Vector3 CurrentForce();
 	bool CheckCollision(const Plane& plane);
 	void ResolveCollision(const Plane &plane);
+	void UpdateSceneNode();
 private:
+	Ogre::SceneNode* m_SceneNode;
 	Vector3 m_CurrentPosition;
 	Vector3 m_PreviousPosition;
 	Vector3 m_CurrentVelocity;
 	float m_Mass;
 	float m_BouncingCoefficient;
 	float m_FrictionCoefficient;
+	float m_Lifetime;
+	float m_LifetimeLeft;
 };
 

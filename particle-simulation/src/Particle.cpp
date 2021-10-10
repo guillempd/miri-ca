@@ -2,22 +2,35 @@
 
 using Ogre::Vector3;
 
-Particle::Particle()
-	: Particle(Vector3(0.0f, 0.0f, 0.0f))
-{}
+Particle::Particle(Ogre::SceneNode* sceneNode)
+	: m_SceneNode(sceneNode)
+{
+	Reset();
+}
 
-Particle::Particle(const Vector3 &initialPosition)
-	: m_CurrentPosition(initialPosition)
-	, m_PreviousPosition(initialPosition) // TODO: Correctly initialize for Verlet solver
-	, m_CurrentVelocity(0.0f, 0.0f, 0.0f)
-	, m_Mass(1.0f)
-	, m_BouncingCoefficient(1.0f)
-	, m_FrictionCoefficient(0.5f)
-{}
+void Particle::Reset(const Vector3& initialPosition)
+{
+	m_CurrentPosition = initialPosition;
+	m_PreviousPosition = initialPosition; // TODO: Correctly initialize for Verlet solver
+	m_CurrentVelocity = Vector3(0.0f, 0.0f, 0.0f);
+	m_Mass = 1.0f;
+	m_BouncingCoefficient = 1.0f;
+	m_FrictionCoefficient = 0.5f;
+	m_Lifetime = 5.0f;
+	m_LifetimeLeft = 5.0f;
+}
 
 // TODO: Add more solvers
 void Particle::Update(float dt, SolverMethod method)
 {
+	m_LifetimeLeft -= dt;
+	if (m_LifetimeLeft <= 0.0f)
+	{
+		dt = -m_LifetimeLeft;
+		m_LifetimeLeft += m_Lifetime;
+		Reset();
+	}
+
 	Vector3 currentAcceleration = CurrentForce() / m_Mass;
 	switch (method)
 	{
@@ -41,11 +54,17 @@ void Particle::Update(float dt, SolverMethod method)
 		m_CurrentPosition += m_CurrentVelocity;*/ // No need for timestep since it is already taken into account
 	} break;
 	}
+
+	UpdateSceneNode();
 }
 
 void Particle::CheckAndResolveCollision(const Plane& plane)
 {
-	if (CheckCollision(plane)) ResolveCollision(plane);
+	if (CheckCollision(plane))
+	{
+		ResolveCollision(plane);
+		UpdateSceneNode();
+	}
 }
 
 void Particle::CheckAndResolveCollision(const Sphere& sphere)
@@ -57,12 +76,13 @@ void Particle::CheckAndResolveCollision(const Sphere& sphere)
 		Vector3 contactPoint = sphere.ContactPoint(m_PreviousPosition, m_CurrentPosition);
 		Plane normal = Plane(contactPoint - sphere.center, contactPoint);
 		ResolveCollision(normal);
+		UpdateSceneNode();
 	}
 }
 
 Vector3 Particle::CurrentForce()
 {
-	return Vector3(0.0f, -9.8f, 0.0f);
+	return Vector3(0.0f, -5.0f, 0.0f);
 }
 
 bool Particle::CheckCollision(const Plane& plane)
@@ -80,4 +100,9 @@ void Particle::ResolveCollision(const Plane& plane)
 	Vector3 normalVelocity = plane.normal.dotProduct(m_CurrentVelocity) * plane.normal;
 	Vector3 tangentVelocity = m_CurrentVelocity - normalVelocity;
 	m_CurrentVelocity -= m_FrictionCoefficient * tangentVelocity;
+}
+
+void Particle::UpdateSceneNode()
+{
+	m_SceneNode->setPosition(m_CurrentPosition);
 }
