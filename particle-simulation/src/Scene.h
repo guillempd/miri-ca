@@ -26,9 +26,9 @@ private:
 	std::vector<Particle> m_Particles;
 	Plane m_Plane;
 	Sphere m_Sphere;
+	Particle::PhysicalProperties m_ParticlesPhysicalProperties;
 	int m_NumParticles;
 	int m_NumActiveParticles;
-	float m_Lifetime;
 	float m_ElapsedTime;
 	Ogre::SceneManager* m_SceneManager;
 	OgreBites::CameraMan* m_CameraMan;

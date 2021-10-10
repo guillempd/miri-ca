@@ -8,9 +8,9 @@ Scene::Scene()
 	: m_Particles()
 	, m_Plane(Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 0.0f, 0.0f)) // Floor
 	, m_Sphere{Vector3(0.0f, 0.0f, 0.0f), 3.0f}
+	, m_ParticlesPhysicalProperties{Vector3(0.0f, -9.8f, 0.0f), 1.0f, 0.5f, 0.5f, 5.0f}
 	, m_NumParticles(10)
 	, m_NumActiveParticles(0)
-	, m_Lifetime(5.0f)
 	, m_ElapsedTime(0.0f)
 {
 }
@@ -82,17 +82,25 @@ Scene::~Scene()
 
 void Scene::Update(float dt)
 {
-	if (ImGui::Begin("Solver Method"))
+	if (ImGui::Begin("Settings"))
 	{
+		ImGui::Text("Solver Method");
 		ImGui::RadioButton("Euler Original", reinterpret_cast<int*>(&m_SolverMethod), static_cast<int>(Particle::SolverMethod::Euler));
 		ImGui::RadioButton("Euler Semi Implicit", reinterpret_cast<int*>(&m_SolverMethod), static_cast<int>(Particle::SolverMethod::EulerSemi));
 		ImGui::RadioButton("Verlet", reinterpret_cast<int*>(&m_SolverMethod), static_cast<int>(Particle::SolverMethod::Verlet));
+
+		ImGui::Separator();
+
+		ImGui::Text("Particle Physical Properties");
+		ImGui::SliderFloat("Mass", &m_ParticlesPhysicalProperties.mass, 0.1f, 10.0f);
+		ImGui::SliderFloat("Bouncing Coefficient", &m_ParticlesPhysicalProperties.bouncingCoefficient, 0.1f, 1.0f);
+		ImGui::SliderFloat("Friction Coefficient", &m_ParticlesPhysicalProperties.frictionCoefficient, 0.1f, 1.0f);
 	}
 	ImGui::End();
 
 	// Update numActiveParticles, for now assume the lifetime is fixed
 	m_ElapsedTime += dt;
-	m_NumActiveParticles = m_NumParticles * (m_ElapsedTime / m_Lifetime);
+	m_NumActiveParticles = m_NumParticles * (m_ElapsedTime / m_ParticlesPhysicalProperties.lifetime);
 	m_NumActiveParticles = (m_NumActiveParticles <= m_NumParticles ? m_NumActiveParticles : m_NumParticles);
 
 	for (int i = 0; i < m_NumActiveParticles; ++i)
@@ -103,11 +111,11 @@ void Scene::Update(float dt)
 		if (actualDt <= 0.0f)
 		{
 			actualDt = -actualDt;
-			particle.Reset(Particle::GenerationType::Cascade, m_Lifetime);
+			particle.Reset(Particle::GenerationType::Cascade, m_ParticlesPhysicalProperties.lifetime);
 		}
-		particle.UpdatePosition(actualDt, m_SolverMethod);
-		particle.CheckAndResolveCollision(m_Plane);
-		particle.CheckAndResolveCollision(m_Sphere);
+		particle.UpdatePosition(actualDt, m_SolverMethod, m_ParticlesPhysicalProperties);
+		particle.CheckAndResolveCollision(m_Plane, m_ParticlesPhysicalProperties);
+		particle.CheckAndResolveCollision(m_Sphere, m_ParticlesPhysicalProperties);
 	}
 
 }
