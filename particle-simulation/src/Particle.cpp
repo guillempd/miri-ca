@@ -105,8 +105,8 @@ bool Particle::CheckCollision(const Plane& plane)
 
 bool Particle::CheckCollision(const Sphere& sphere)
 {
-	float previousSignedDistance = sphere.DistanceToSurface(m_PreviousPosition);
-	float currentSignedDistance = sphere.DistanceToSurface(m_CurrentPosition);
+	float previousSignedDistance = sphere.SignedDistance(m_PreviousPosition);
+	float currentSignedDistance = sphere.SignedDistance(m_CurrentPosition);
 	return previousSignedDistance * currentSignedDistance <= 0;
 }
 
@@ -123,7 +123,7 @@ void Particle::ResolveCollision(const Plane& plane, const PhysicalProperties& pr
 void Particle::ResolveCollision(const Sphere& sphere, const PhysicalProperties& properties)
 {
 	Vector3 contactPoint = sphere.ContactPoint(m_PreviousPosition, m_CurrentPosition);
-	Plane normal = Plane(nullptr, contactPoint - sphere.center, contactPoint);
+	Plane normal = Plane(nullptr, contactPoint - sphere.GetCenter(), contactPoint);
 	ResolveCollision(normal, properties);
 }
 

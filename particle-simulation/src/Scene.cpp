@@ -71,45 +71,52 @@ void Scene::SetupEntities()
 	}
 
 	Ogre::Entity* planeEntity;
-	Ogre::SceneNode* planeSceneNode;
+	Ogre::SceneNode* planeEntityNode;
 	Ogre::MeshPtr meshPtr = Ogre::MeshManager::getSingleton().createPlane("Plane", "General", Ogre::Plane(Vector3(0.0f, 0.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f)), 2, 2);
 	m_Planes.reserve(6);
 
 	// FLOOR
 	planeEntity = m_SceneManager->createEntity(meshPtr);
-	planeSceneNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
-	planeSceneNode->attachObject(planeEntity);
-	m_Planes.emplace_back(planeSceneNode, Vector3(0.0f, -1.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f));
+	planeEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
+	planeEntityNode->attachObject(planeEntity);
+	m_Planes.emplace_back(planeEntityNode, Vector3(0.0f, -1.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f));
 
 	// CEILING
 	planeEntity = m_SceneManager->createEntity(meshPtr);
-	planeSceneNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
-	planeSceneNode->attachObject(planeEntity);
-	m_Planes.emplace_back(planeSceneNode, Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f));
+	planeEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
+	planeEntityNode->attachObject(planeEntity);
+	m_Planes.emplace_back(planeEntityNode, Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f));
 
 	// LEFT FACE
 	planeEntity = m_SceneManager->createEntity(meshPtr);
-	planeSceneNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
-	planeSceneNode->attachObject(planeEntity);
-	m_Planes.emplace_back(planeSceneNode, Vector3(-1.0f, 0.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f));
+	planeEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
+	planeEntityNode->attachObject(planeEntity);
+	m_Planes.emplace_back(planeEntityNode, Vector3(-1.0f, 0.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f));
 
 	// RIGHT FACE
 	planeEntity = m_SceneManager->createEntity(meshPtr);
-	planeSceneNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
-	planeSceneNode->attachObject(planeEntity);
-	m_Planes.emplace_back(planeSceneNode, Vector3(1.0f, 0.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f));
+	planeEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
+	planeEntityNode->attachObject(planeEntity);
+	m_Planes.emplace_back(planeEntityNode, Vector3(1.0f, 0.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f));
 
 	// FRONT FACE
 	planeEntity = m_SceneManager->createEntity(meshPtr);
-	planeSceneNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
-	planeSceneNode->attachObject(planeEntity);
-	m_Planes.emplace_back(planeSceneNode, Vector3(0.0f, 0.0f, 1.0f), Vector3(0.0f, 0.0f, 1.0f));
+	planeEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
+	planeEntityNode->attachObject(planeEntity);
+	m_Planes.emplace_back(planeEntityNode, Vector3(0.0f, 0.0f, 1.0f), Vector3(0.0f, 0.0f, 1.0f));
 
 	// BACK FACE
 	planeEntity = m_SceneManager->createEntity(meshPtr);
-	planeSceneNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
-	planeSceneNode->attachObject(planeEntity);
-	m_Planes.emplace_back(planeSceneNode, Vector3(0.0f, 0.0f, -1.0f), Vector3(0.0f, 0.0f, -1.0f));
+	planeEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
+	planeEntityNode->attachObject(planeEntity);
+	m_Planes.emplace_back(planeEntityNode, Vector3(0.0f, 0.0f, -1.0f), Vector3(0.0f, 0.0f, -1.0f));
+
+	m_Spheres.reserve(1);
+	Ogre::Entity* sphereEntity = m_SceneManager->createEntity("sphere.mesh");
+	Ogre::SceneNode* sphereEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
+	sphereEntityNode->attachObject(sphereEntity);
+	sphereEntityNode->setScale(0.01f, 0.01f, 0.01f);
+	m_Spheres.emplace_back(sphereEntityNode, Vector3(0.0f, 0.0f, 0.0f), 0.5f);
 }
 
 // TODO: Destroy SceneNode's (?)
