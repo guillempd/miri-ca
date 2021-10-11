@@ -5,12 +5,14 @@
 
 #include <Ogre.h>
 
+#include <random>
+
 class Particle
 {
 	using Vector3 = Ogre::Vector3;
 public:
 	enum class SolverMethod {Euler, EulerSemi, Verlet};
-	enum class GenerationType {Cascade, Fountain};
+	enum class GenerationType {Random, Cascade, Fountain};
 	struct PhysicalProperties
 	{
 		Vector3 gravity;
@@ -39,5 +41,7 @@ private:
 	Vector3 m_PreviousPosition;
 	Vector3 m_CurrentVelocity;
 	float m_LifetimeLeft;
+	static std::minstd_rand s_Rng;
+	static std::uniform_real_distribution<float> s_UniformFloat;
 };
 

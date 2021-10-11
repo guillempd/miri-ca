@@ -140,7 +140,6 @@ void Scene::Update(float dt)
 	}
 	ImGui::End();
 
-	// Update numActiveParticles, for now assume the lifetime is fixed
 	m_ElapsedTime += dt;
 	m_NumActiveParticles = static_cast<int>(m_NumParticles * (m_ElapsedTime / m_ParticlesPhysicalProperties.lifetime));
 	m_NumActiveParticles = (m_NumActiveParticles <= m_NumParticles ? m_NumActiveParticles : m_NumParticles);
@@ -153,7 +152,7 @@ void Scene::Update(float dt)
 		if (actualDt <= 0.0f)
 		{
 			actualDt = -actualDt;
-			particle.Reset(Particle::GenerationType::Cascade, m_ParticlesPhysicalProperties.lifetime);
+			particle.Reset(Particle::GenerationType::Random, m_ParticlesPhysicalProperties.lifetime);
 		}
 		particle.UpdatePosition(actualDt, m_SolverMethod, m_ParticlesPhysicalProperties);
 		CheckPlanes(particle);
