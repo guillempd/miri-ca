@@ -18,8 +18,8 @@ Scene::Scene()
 void Scene::Setup(Ogre::SceneManager* sceneManager, Ogre::RenderWindow* renderWindow)
 {
 	m_SceneManager = sceneManager;
-	SetupLighting();
 	SetupCamera(renderWindow);
+	SetupLighting();
 	SetupEntities();
 }
 
@@ -27,13 +27,27 @@ void Scene::SetupLighting()
 {
 	m_SceneManager->setAmbientLight(Ogre::ColourValue(0.1f, 0.1f, 0.1f));
 	
-	Ogre::Light* directionalLight = m_SceneManager->createLight("DirectionalLight", Ogre::Light::LightTypes::LT_DIRECTIONAL);
-	directionalLight->setDiffuseColour(Ogre::ColourValue(0.5f, 0.5f, 0.5f));
-	directionalLight->setSpecularColour(Ogre::ColourValue(0.5f, 0.5f, 0.5f));
+	Ogre::Light* redDirectionalLight = m_SceneManager->createLight(Ogre::Light::LightTypes::LT_DIRECTIONAL);
+	redDirectionalLight->setDiffuseColour(Ogre::ColourValue(0.2f, 0.0f, 0.0f));
+	redDirectionalLight->setSpecularColour(Ogre::ColourValue(0.2f, 0.0f, 0.0f));
 
-	Ogre::SceneNode* directionalLightNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
-	directionalLightNode->attachObject(directionalLight);
-	directionalLightNode->setDirection(0, 10, 15); // TODO: Set appropiately
+	Ogre::SceneNode* redDirectionalLightNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
+	redDirectionalLightNode->attachObject(redDirectionalLight);
+	redDirectionalLightNode->setDirection(1, 0, 0); // TODO: Set appropiately
+
+	Ogre::Light* blueDirectionalLight = m_SceneManager->createLight(Ogre::Light::LightTypes::LT_DIRECTIONAL);
+	blueDirectionalLight->setDiffuseColour(Ogre::ColourValue(0.0f, 0.0f, 0.2f));
+	blueDirectionalLight->setSpecularColour(Ogre::ColourValue(0.0f, 0.0f, 0.2f));
+
+	Ogre::SceneNode* blueDirectionalLightNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
+	blueDirectionalLightNode->attachObject(blueDirectionalLight);
+	blueDirectionalLightNode->setDirection(-1, 0, 0);
+
+
+	Ogre::Light* pointLight = m_SceneManager->createLight(Ogre::Light::LightTypes::LT_POINT);
+	pointLight->setDiffuseColour(Ogre::ColourValue(0.3f, 0.3f, 0.3f));
+	pointLight->setSpecularColour(Ogre::ColourValue(0.3f, 0.3f, 0.3f));
+	m_CameraMan->getCamera()->attachObject(pointLight);
 }
 
 void Scene::SetupCamera(Ogre::RenderWindow* renderWindow)
