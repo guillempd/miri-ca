@@ -8,6 +8,7 @@ Scene::Scene()
 	: m_Particles()
 	, m_Planes()
 	, m_Spheres()
+	, m_Triangles()
 	, m_ParticlesPhysicalProperties{Vector3(0.0f, -9.8f, 0.0f), 1.0f, 0.5f, 0.5f, 5.0f}
 	, m_NumParticles(100)
 	, m_NumActiveParticles(0)
@@ -53,7 +54,7 @@ void Scene::SetupLighting()
 void Scene::SetupCamera(Ogre::RenderWindow* renderWindow)
 {
 	Ogre::Camera* camera = m_SceneManager->createCamera("Camera");
-	camera->setNearClipDistance(1.0f); // TODO: Set this according to CameraMan orbit distance
+	camera->setNearClipDistance(0.1f); // TODO: Set this according to CameraMan orbit distance
 	camera->setAutoAspectRatio(true);
 
 	Ogre::SceneNode* cameraNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
@@ -79,7 +80,7 @@ void Scene::SetupEntities()
 
 		Ogre::SceneNode* particleEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode(); // TODO: Name these (?)
 		particleEntityNode->attachObject(particleEntity);
-		particleEntityNode->setScale(0.001f, 0.001f, 0.001f);
+		particleEntityNode->setScale(0.0002f, 0.0002f, 0.0002f); // Set particles radius to be 1/100th of cube's side
 
 		m_Particles.emplace_back(particleEntityNode);
 	}
@@ -90,10 +91,10 @@ void Scene::SetupEntities()
 	m_Planes.reserve(6);
 
 	// FLOOR
-	planeEntity = m_SceneManager->createEntity(meshPtr);
+	/*planeEntity = m_SceneManager->createEntity(meshPtr);
 	planeEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
 	planeEntityNode->attachObject(planeEntity);
-	m_Planes.emplace_back(planeEntityNode, Vector3(0.0f, -1.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f));
+	m_Planes.emplace_back(planeEntityNode, Vector3(0.0f, -1.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f));*/
 
 	// CEILING
 	planeEntity = m_SceneManager->createEntity(meshPtr);
@@ -125,12 +126,15 @@ void Scene::SetupEntities()
 	planeEntityNode->attachObject(planeEntity);
 	m_Planes.emplace_back(planeEntityNode, Vector3(0.0f, 0.0f, -1.0f), Vector3(0.0f, 0.0f, -1.0f));
 
-	m_Spheres.reserve(1);
+	/*m_Spheres.reserve(1);
 	Ogre::Entity* sphereEntity = m_SceneManager->createEntity("sphere.mesh");
 	Ogre::SceneNode* sphereEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
 	sphereEntityNode->attachObject(sphereEntity);
 	sphereEntityNode->setScale(0.01f, 0.01f, 0.01f);
-	m_Spheres.emplace_back(sphereEntityNode, Vector3(0.0f, 0.0f, 0.0f), 0.5f);
+	m_Spheres.emplace_back(sphereEntityNode, Vector3(0.0f, 0.0f, 0.0f), 0.5f);*/
+
+	m_Triangles.reserve(1);
+	m_Triangles.emplace_back(Vector3(-1.0f, -1.0f, -1.0f), Vector3(-1.0f, -1.0f, 1.0f), Vector3(1.0f, -1.0f, -1.0f));
 }
 
 // TODO: Destroy SceneNode's (?)
@@ -178,7 +182,7 @@ void Scene::Update(float dt)
 		particle.UpdatePosition(actualDt, m_SolverMethod, m_ParticlesPhysicalProperties);
 		CheckPlanes(particle);
 		CheckSpheres(particle);
-		// CheckTriangles(particle);
+		CheckTriangles(particle);
 	}
 
 }
@@ -196,5 +200,13 @@ void Scene::CheckSpheres(Particle& particle)
 	for (const Sphere& sphere : m_Spheres)
 	{
 		particle.CheckAndResolveCollision(sphere, m_ParticlesPhysicalProperties);
+	}
+}
+
+void Scene::CheckTriangles(Particle& particle)
+{
+	for (const Triangle& triangle : m_Triangles)
+	{
+		particle.CheckAndResolveCollision(triangle, m_ParticlesPhysicalProperties);
 	}
 }

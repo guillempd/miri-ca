@@ -91,6 +91,15 @@ void Particle::CheckAndResolveCollision(const Sphere& sphere, const PhysicalProp
 	}
 }
 
+void Particle::CheckAndResolveCollision(const Triangle& triangle, const PhysicalProperties& properties)
+{
+	if (CheckCollision(triangle))
+	{
+		ResolveCollision(triangle, properties);
+		UpdateSceneNode();
+	}
+}
+
 Vector3 Particle::CurrentForce(const PhysicalProperties &properties)
 {
 	return properties.mass * properties.gravity;
@@ -110,6 +119,15 @@ bool Particle::CheckCollision(const Sphere& sphere)
 	return previousSignedDistance * currentSignedDistance <= 0;
 }
 
+bool Particle::CheckCollision(const Triangle& triangle)
+{
+	const Plane& plane = triangle.GetPlane();
+	if (!CheckCollision(plane)) return false;
+
+	Vector3 contactPoint = plane.ContactPoint(m_PreviousPosition, m_CurrentPosition);
+	return triangle.Contains(contactPoint);
+}
+
 void Particle::ResolveCollision(const Plane& plane, const PhysicalProperties& properties)
 {
 	m_CurrentPosition = m_CurrentPosition - (1 + properties.bouncingCoefficient) * (plane.GetOffset() + plane.GetNormal().dotProduct(m_CurrentPosition)) * plane.GetNormal();
@@ -125,6 +143,11 @@ void Particle::ResolveCollision(const Sphere& sphere, const PhysicalProperties& 
 	Vector3 contactPoint = sphere.ContactPoint(m_PreviousPosition, m_CurrentPosition);
 	Plane normal = Plane(nullptr, contactPoint - sphere.GetCenter(), contactPoint);
 	ResolveCollision(normal, properties);
+}
+
+void Particle::ResolveCollision(const Triangle& triangle, const PhysicalProperties& properties)
+{
+	ResolveCollision(triangle.GetPlane(), properties);
 }
 
 void Particle::UpdateSceneNode()

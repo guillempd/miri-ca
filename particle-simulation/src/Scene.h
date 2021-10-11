@@ -3,6 +3,7 @@
 #include "Particle.h"
 #include "Plane.h"
 #include "Sphere.h"
+#include "Triangle.h"
 
 #include <Ogre.h>
 #include <OgreCameraMan.h>
@@ -24,11 +25,12 @@ private:
 	void SetupEntities();
 	void CheckPlanes(Particle& particle);
 	void CheckSpheres(Particle& particle);
-	//void CheckTriangles(Particle& particle); // TODO: Consider making these a template Check<Collidable>
+	void CheckTriangles(Particle& particle); // TODO: Consider making these a template Check<Collidable>
 private:
 	std::vector<Particle> m_Particles;
 	std::vector<Plane> m_Planes;
 	std::vector<Sphere> m_Spheres;
+	std::vector<Triangle> m_Triangles;
 	Particle::PhysicalProperties m_ParticlesPhysicalProperties;
 	int m_NumParticles;
 	int m_NumActiveParticles;

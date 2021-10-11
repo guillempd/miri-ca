@@ -2,6 +2,7 @@
 
 #include "Plane.h"
 #include "Sphere.h"
+#include "Triangle.h"
 
 #include <Ogre.h>
 
@@ -28,12 +29,15 @@ public:
 	void UpdatePosition(float dt, SolverMethod method, const PhysicalProperties& properties);
 	void CheckAndResolveCollision(const Plane &plane, const PhysicalProperties& properties);
 	void CheckAndResolveCollision(const Sphere &sphere, const PhysicalProperties& properties);
+	void CheckAndResolveCollision(const Triangle& triangle, const PhysicalProperties& properties);
 private:
 	Vector3 CurrentForce(const PhysicalProperties& properties);
 	bool CheckCollision(const Plane& plane);
 	bool CheckCollision(const Sphere& sphere);
+	bool CheckCollision(const Triangle& triangle);
 	void ResolveCollision(const Plane& plane, const PhysicalProperties& properties);
 	void ResolveCollision(const Sphere& sphere, const PhysicalProperties& properties);
+	void ResolveCollision(const Triangle& triangle, const PhysicalProperties& properties);
 	void UpdateSceneNode();
 private:
 	Ogre::SceneNode* m_SceneNode;

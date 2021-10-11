@@ -8,6 +8,7 @@ class Plane
 public:
 	Plane(Ogre::SceneNode* sceneNode, const Vector3& normal, const Vector3& pointInPlane);
 	float SignedDistance(const Vector3& point) const;
+	Vector3 ContactPoint(const Vector3& origin, const Vector3& destiny) const;
 	const Vector3& GetNormal() const { return m_Normal; }
 	const Vector3& GetPosition() const { return m_Position; }
 	float GetOffset() const { return m_Offset; }
