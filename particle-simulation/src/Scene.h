@@ -22,10 +22,13 @@ private:
 	void SetupLighting();
 	void SetupCamera(Ogre::RenderWindow* renderWindow);
 	void SetupEntities();
+	void CheckPlanes(Particle& particle);
+	void CheckSpheres(Particle& particle);
+	//void CheckTriangles(Particle& particle); // TODO: Consider making these a template Check<Collidable>
 private:
 	std::vector<Particle> m_Particles;
-	Plane m_Plane;
-	Sphere m_Sphere;
+	std::vector<Plane> m_Planes;
+	std::vector<Sphere> m_Spheres;
 	Particle::PhysicalProperties m_ParticlesPhysicalProperties;
 	int m_NumParticles;
 	int m_NumActiveParticles;

@@ -38,7 +38,7 @@ void ParticleSimulationApp::setup()
 void ParticleSimulationApp::shutdown()
 {
     OgreBites::ApplicationContext::shutdown();
-    delete m_ImGuiOverlay; // TODO: OverlayManager::removeOverlay(m_ImGuiOverlay) (?)
+    // delete m_ImGuiOverlay; // TODO: OverlayManager::removeOverlay(m_ImGuiOverlay) (?)
     delete m_ImGuiInputListener;
 }
 

@@ -2,15 +2,18 @@
 
 #include <Ogre.h>
 
-struct Plane
+class Plane
 {
 	using Vector3 = Ogre::Vector3;
-	Vector3 normal;
-	float offset;
-
-	Plane(const Vector3& direction, const Vector3& pointInPlane) // TODO: Check this code for changing the parameter direction to normal
-		: normal(direction.normalisedCopy())
-		, offset(-normal.dotProduct(pointInPlane))
-	{
-	}
+public:
+	Plane(Ogre::SceneNode* sceneNode, const Vector3& normal, const Vector3& pointInPlane);
+	float SignedDistance(const Vector3& point) const;
+	const Vector3& GetNormal() const { return m_Normal; }
+	const Vector3& GetPosition() const { return m_Position; }
+	float GetOffset() const { return m_Offset; }
+private:
+	Ogre::SceneNode* m_SceneNode;
+	Vector3 m_Normal;
+	Vector3 m_Position;
+	float m_Offset;
 };

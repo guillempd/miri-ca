@@ -28,8 +28,10 @@ public:
 	void CheckAndResolveCollision(const Sphere &sphere, const PhysicalProperties& properties);
 private:
 	Vector3 CurrentForce(const PhysicalProperties& properties);
-	bool CheckCollision(const Plane& plane, const PhysicalProperties& properties);
-	void ResolveCollision(const Plane &plane, const PhysicalProperties& properties);
+	bool CheckCollision(const Plane& plane);
+	bool CheckCollision(const Sphere& sphere);
+	void ResolveCollision(const Plane& plane, const PhysicalProperties& properties);
+	void ResolveCollision(const Sphere& sphere, const PhysicalProperties& properties);
 	void UpdateSceneNode();
 private:
 	Ogre::SceneNode* m_SceneNode;

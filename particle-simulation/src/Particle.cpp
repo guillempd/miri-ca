@@ -68,7 +68,7 @@ void Particle::UpdatePosition(float dt, SolverMethod method, const PhysicalPrope
 
 void Particle::CheckAndResolveCollision(const Plane& plane, const PhysicalProperties& properties)
 {
-	if (CheckCollision(plane, properties))
+	if (CheckCollision(plane))
 	{
 		ResolveCollision(plane, properties);
 		UpdateSceneNode();
@@ -77,13 +77,9 @@ void Particle::CheckAndResolveCollision(const Plane& plane, const PhysicalProper
 
 void Particle::CheckAndResolveCollision(const Sphere& sphere, const PhysicalProperties& properties)
 {
-	float previousSign = sphere.DistanceToSurface(m_PreviousPosition);
-	float currentSign = sphere.DistanceToSurface(m_CurrentPosition);
-	if (previousSign * currentSign <= 0)
+	if (CheckCollision(sphere))
 	{
-		Vector3 contactPoint = sphere.ContactPoint(m_PreviousPosition, m_CurrentPosition);
-		Plane normal = Plane(contactPoint - sphere.center, contactPoint);
-		ResolveCollision(normal, properties);
+		ResolveCollision(sphere, properties);
 		UpdateSceneNode();
 	}
 }
@@ -93,21 +89,35 @@ Vector3 Particle::CurrentForce(const PhysicalProperties &properties)
 	return properties.mass * properties.gravity;
 }
 
-bool Particle::CheckCollision(const Plane& plane, const PhysicalProperties& properties)
+bool Particle::CheckCollision(const Plane& plane)
 {
-	float previousSign = plane.normal.dotProduct(m_PreviousPosition) + plane.offset; // TODO: Consider refactoring this computation into a Plane function
-	float currentSign = plane.normal.dotProduct(m_CurrentPosition) + plane.offset;
-	return previousSign * currentSign <= 0;
+	float previousSignedDistance = plane.SignedDistance(m_PreviousPosition);
+	float currentSignedDistance = plane.SignedDistance(m_CurrentPosition);
+	return previousSignedDistance * currentSignedDistance <= 0;
+}
+
+bool Particle::CheckCollision(const Sphere& sphere)
+{
+	float previousSignedDistance = sphere.DistanceToSurface(m_PreviousPosition);
+	float currentSignedDistance = sphere.DistanceToSurface(m_CurrentPosition);
+	return previousSignedDistance * currentSignedDistance <= 0;
 }
 
 void Particle::ResolveCollision(const Plane& plane, const PhysicalProperties& properties)
 {
-	m_CurrentPosition = m_CurrentPosition - (1 + properties.bouncingCoefficient) * (plane.offset + plane.normal.dotProduct(m_CurrentPosition)) * plane.normal;
-	m_CurrentVelocity = m_CurrentVelocity - (1 + properties.bouncingCoefficient) * plane.normal.dotProduct(m_CurrentVelocity) * plane.normal;
+	m_CurrentPosition = m_CurrentPosition - (1 + properties.bouncingCoefficient) * (plane.GetOffset() + plane.GetNormal().dotProduct(m_CurrentPosition)) * plane.GetNormal();
+	m_CurrentVelocity = m_CurrentVelocity - (1 + properties.bouncingCoefficient) * plane.GetNormal().dotProduct(m_CurrentVelocity) * plane.GetNormal();
 
-	Vector3 normalVelocity = plane.normal.dotProduct(m_CurrentVelocity) * plane.normal;
+	Vector3 normalVelocity = plane.GetNormal().dotProduct(m_CurrentVelocity) * plane.GetNormal();
 	Vector3 tangentVelocity = m_CurrentVelocity - normalVelocity;
 	m_CurrentVelocity -= properties.frictionCoefficient * tangentVelocity;
+}
+
+void Particle::ResolveCollision(const Sphere& sphere, const PhysicalProperties& properties)
+{
+	Vector3 contactPoint = sphere.ContactPoint(m_PreviousPosition, m_CurrentPosition);
+	Plane normal = Plane(nullptr, contactPoint - sphere.center, contactPoint);
+	ResolveCollision(normal, properties);
 }
 
 void Particle::UpdateSceneNode()
