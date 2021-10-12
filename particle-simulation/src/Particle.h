@@ -27,18 +27,19 @@ public:
 	void Reset(GenerationType generationType, float lifetime);
 	float UpdateLifetime(float dt);
 	void UpdatePosition(float dt, SolverMethod method, const PhysicalProperties& properties);
-	void CheckAndResolveCollision(const Plane &plane, const PhysicalProperties& properties);
-	void CheckAndResolveCollision(const Sphere &sphere, const PhysicalProperties& properties);
-	void CheckAndResolveCollision(const Triangle& triangle, const PhysicalProperties& properties);
+	void CheckAndResolveCollision(const Plane &plane, const PhysicalProperties& properties, float dt);
+	void CheckAndResolveCollision(const Sphere &sphere, const PhysicalProperties& properties, float dt);
+	void CheckAndResolveCollision(const Triangle& triangle, const PhysicalProperties& properties, float dt);
 private:
-	Vector3 CurrentForce(const PhysicalProperties& properties);
-	bool CheckCollision(const Plane& plane);
-	bool CheckCollision(const Sphere& sphere);
-	bool CheckCollision(const Triangle& triangle);
-	void ResolveCollision(const Plane& plane, const PhysicalProperties& properties);
-	void ResolveCollision(const Sphere& sphere, const PhysicalProperties& properties);
-	void ResolveCollision(const Triangle& triangle, const PhysicalProperties& properties);
+	Vector3 CurrentForce(const PhysicalProperties& properties) const;
+	bool CheckCollision(const Plane& plane) const;
+	bool CheckCollision(const Sphere& sphere) const;
+	bool CheckCollision(const Triangle& triangle) const;
+	void ResolveCollision(const Plane& plane, const PhysicalProperties& properties, float dt);
+	void ResolveCollision(const Sphere& sphere, const PhysicalProperties& properties, float dt);
+	void ResolveCollision(const Triangle& triangle, const PhysicalProperties& properties, float dt);
 	void UpdateSceneNode();
+	void CorrectPreviousPosition(float dt);
 private:
 	Ogre::SceneNode* m_SceneNode;
 	Vector3 m_CurrentPosition;

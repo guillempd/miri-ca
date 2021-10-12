@@ -23,9 +23,9 @@ private:
 	void SetupLighting();
 	void SetupCamera(Ogre::RenderWindow* renderWindow);
 	void SetupEntities();
-	void CheckPlanes(Particle& particle);
-	void CheckSpheres(Particle& particle);
-	void CheckTriangles(Particle& particle); // TODO: Consider making these a template Check<Collidable>
+	void CheckPlanes(Particle& particle, float dt);
+	void CheckSpheres(Particle& particle, float dt);
+	void CheckTriangles(Particle& particle, float dt); // TODO: Consider making these a template Check<Collidable>
 private:
 	std::vector<Particle> m_Particles;
 	std::vector<Plane> m_Planes;

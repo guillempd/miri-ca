@@ -34,7 +34,7 @@ void Scene::SetupLighting()
 
 	Ogre::SceneNode* redDirectionalLightNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
 	redDirectionalLightNode->attachObject(redDirectionalLight);
-	redDirectionalLightNode->setDirection(1, 0, 0); // TODO: Set appropiately
+	redDirectionalLightNode->setDirection(1, 0, 0);
 
 	Ogre::Light* blueDirectionalLight = m_SceneManager->createLight(Ogre::Light::LightTypes::LT_DIRECTIONAL);
 	blueDirectionalLight->setDiffuseColour(Ogre::ColourValue(0.0f, 0.0f, 0.2f));
@@ -54,7 +54,7 @@ void Scene::SetupLighting()
 void Scene::SetupCamera(Ogre::RenderWindow* renderWindow)
 {
 	Ogre::Camera* camera = m_SceneManager->createCamera("Camera");
-	camera->setNearClipDistance(0.1f); // TODO: Set this according to CameraMan orbit distance
+	camera->setNearClipDistance(0.1f);
 	camera->setAutoAspectRatio(true);
 
 	Ogre::SceneNode* cameraNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
@@ -64,7 +64,7 @@ void Scene::SetupCamera(Ogre::RenderWindow* renderWindow)
 
 	m_CameraMan = new OgreBites::CameraMan(cameraNode);
 	m_CameraMan->setStyle(OgreBites::CS_ORBIT);
-	m_CameraMan->setTarget(m_SceneManager->getRootSceneNode()); // TODO: Set this to the floor plane probably
+	m_CameraMan->setTarget(m_SceneManager->getRootSceneNode());
 	m_CameraMan->setTopSpeed(10.0f); // TODO: Set appropriately
 
 	renderWindow->addViewport(camera);
@@ -78,7 +78,7 @@ void Scene::SetupEntities()
 		Ogre::Entity* particleEntity = m_SceneManager->createEntity("sphere.mesh");
 		particleEntity->setMaterial(Ogre::MaterialManager::getSingleton().getDefaultMaterial());
 
-		Ogre::SceneNode* particleEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode(); // TODO: Name these (?)
+		Ogre::SceneNode* particleEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
 		particleEntityNode->attachObject(particleEntity);
 		particleEntityNode->setScale(0.0002f, 0.0002f, 0.0002f); // Set particles radius to be 1/100th of cube's side
 
@@ -177,36 +177,36 @@ void Scene::Update(float dt)
 		if (actualDt <= 0.0f)
 		{
 			actualDt = -actualDt;
-			particle.Reset(Particle::GenerationType::Random, m_ParticlesPhysicalProperties.lifetime);
+			particle.Reset(Particle::GenerationType::Random, m_ParticlesPhysicalProperties.lifetime); // What dt to pass here (?)
 		}
 		particle.UpdatePosition(actualDt, m_SolverMethod, m_ParticlesPhysicalProperties);
-		CheckPlanes(particle);
-		CheckSpheres(particle);
-		CheckTriangles(particle);
+		CheckPlanes(particle, actualDt);
+		CheckSpheres(particle, actualDt);
+		CheckTriangles(particle, actualDt);
 	}
 
 }
 
-void Scene::CheckPlanes(Particle& particle)
+void Scene::CheckPlanes(Particle& particle, float dt)
 {
 	for (const Plane& plane : m_Planes)
 	{
-		particle.CheckAndResolveCollision(plane, m_ParticlesPhysicalProperties);
+		particle.CheckAndResolveCollision(plane, m_ParticlesPhysicalProperties, dt);
 	}
 }
 
-void Scene::CheckSpheres(Particle& particle)
+void Scene::CheckSpheres(Particle& particle, float dt)
 {
 	for (const Sphere& sphere : m_Spheres)
 	{
-		particle.CheckAndResolveCollision(sphere, m_ParticlesPhysicalProperties);
+		particle.CheckAndResolveCollision(sphere, m_ParticlesPhysicalProperties, dt);
 	}
 }
 
-void Scene::CheckTriangles(Particle& particle)
+void Scene::CheckTriangles(Particle& particle, float dt)
 {
 	for (const Triangle& triangle : m_Triangles)
 	{
-		particle.CheckAndResolveCollision(triangle, m_ParticlesPhysicalProperties);
+		particle.CheckAndResolveCollision(triangle, m_ParticlesPhysicalProperties, dt);
 	}
 }
