@@ -16,7 +16,7 @@ bool Triangle::Contains(const Vector3& pointInPlane) const
 	float a2 = Triangle(m_P0, pointInPlane, m_P2).Area();
 	float a3 = Triangle(m_P0, m_P1, pointInPlane).Area();
 	float a = Area();
-	return a1 + a2 + a3 - a > 0.0f;
+	return a1 + a2 + a3 - a <= 0.0f;
 }
 
 // NOTE: Not really area, should be multiplied by 1/2. Works for the point-inside-triangle-test
