@@ -146,67 +146,77 @@ void Scene::SetupEntities()
 {
 	m_Particles.reserve(m_NumParticles);
 	for (int i = 0; i < m_NumParticles; ++i)
-	{
-		Ogre::Entity* particleEntity = m_SceneManager->createEntity("sphere.mesh");
-		particleEntity->setMaterial(m_Materials[m_UniformMaterialIndex(m_Rng)]);
+		CreateParticle();
 
-		Ogre::SceneNode* particleEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
-		particleEntityNode->attachObject(particleEntity);
-		particleEntityNode->setScale(0.0002f, 0.0002f, 0.0002f); // Set particles radius to be 1/100th of cube's side
-
-		m_Particles.emplace_back(particleEntityNode);
-	}
-
-	Ogre::Entity* planeEntity;
-	Ogre::SceneNode* planeEntityNode;
 	Ogre::MeshPtr meshPtr = Ogre::MeshManager::getSingleton().createPlane("Plane", "General", Ogre::Plane(Vector3(0.0f, 0.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f)), 2, 2);
 	m_Planes.reserve(6);
+	CreatePlane(Vector3(0.0f, -1.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f), meshPtr);
+	CreatePlane(Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f), meshPtr);
+	CreatePlane(Vector3(-1.0f, 0.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f), meshPtr);
+	CreatePlane(Vector3(1.0f, 0.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f), meshPtr);
+	CreatePlane(Vector3(0.0f, 0.0f, 1.0f), Vector3(0.0f, 0.0f, 1.0f), meshPtr);
+	CreatePlane(Vector3(0.0f, 0.0f, -1.0f), Vector3(0.0f, 0.0f, -1.0f), meshPtr);
 
-	// FLOOR
-	/*planeEntity = m_SceneManager->createEntity(meshPtr);
-	planeEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
+	m_Spheres.reserve(1);
+	CreateSphere(Vector3(0.0f, -0.50f, 0.0f), 0.25f);
+
+	m_Triangles.reserve(1);
+	CreateTriangle(Vector3(0.5f, 0.0f, 0.0f), Vector3(-0.5f, 0.1f, 0.5f), Vector3(-0.5f, 0.2f, -0.5f));
+}
+
+void Scene::CreateParticle()
+{
+	Ogre::Entity* particleEntity = m_SceneManager->createEntity("sphere.mesh");
+	particleEntity->setMaterial(m_Materials[m_UniformMaterialIndex(m_Rng)]);
+
+	Ogre::SceneNode* particleEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
+	particleEntityNode->attachObject(particleEntity);
+	particleEntityNode->setScale(0.0002f, 0.0002f, 0.0002f); // Set particles radius to be 1/100th of cube's side
+
+	m_Particles.emplace_back(particleEntityNode);
+}
+
+void Scene::CreatePlane(const Vector3 &normal, const Vector3& pointInPlane, Ogre::MeshPtr meshPtr)
+{
+	Ogre::Entity* planeEntity = m_SceneManager->createEntity(meshPtr);
+	Ogre::SceneNode* planeEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
 	planeEntityNode->attachObject(planeEntity);
-	m_Planes.emplace_back(planeEntityNode, Vector3(0.0f, -1.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f));*/
+	m_Planes.emplace_back(planeEntityNode, normal, pointInPlane);
+}
 
-	// CEILING
-	planeEntity = m_SceneManager->createEntity(meshPtr);
-	planeEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
-	planeEntityNode->attachObject(planeEntity);
-	m_Planes.emplace_back(planeEntityNode, Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f));
-
-	// LEFT FACE
-	planeEntity = m_SceneManager->createEntity(meshPtr);
-	planeEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
-	planeEntityNode->attachObject(planeEntity);
-	m_Planes.emplace_back(planeEntityNode, Vector3(-1.0f, 0.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f));
-
-	// RIGHT FACE
-	planeEntity = m_SceneManager->createEntity(meshPtr);
-	planeEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
-	planeEntityNode->attachObject(planeEntity);
-	m_Planes.emplace_back(planeEntityNode, Vector3(1.0f, 0.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f));
-
-	// FRONT FACE
-	planeEntity = m_SceneManager->createEntity(meshPtr);
-	planeEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
-	planeEntityNode->attachObject(planeEntity);
-	m_Planes.emplace_back(planeEntityNode, Vector3(0.0f, 0.0f, 1.0f), Vector3(0.0f, 0.0f, 1.0f));
-
-	// BACK FACE
-	planeEntity = m_SceneManager->createEntity(meshPtr);
-	planeEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
-	planeEntityNode->attachObject(planeEntity);
-	m_Planes.emplace_back(planeEntityNode, Vector3(0.0f, 0.0f, -1.0f), Vector3(0.0f, 0.0f, -1.0f));
-
-	/*m_Spheres.reserve(1);
+void Scene::CreateSphere(const Vector3& center, float radius)
+{
 	Ogre::Entity* sphereEntity = m_SceneManager->createEntity("sphere.mesh");
 	Ogre::SceneNode* sphereEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
 	sphereEntityNode->attachObject(sphereEntity);
 	sphereEntityNode->setScale(0.01f, 0.01f, 0.01f);
-	m_Spheres.emplace_back(sphereEntityNode, Vector3(0.0f, 0.0f, 0.0f), 0.5f);*/
+	m_Spheres.emplace_back(sphereEntityNode, center, radius);
+}
 
-	m_Triangles.reserve(1);
-	m_Triangles.emplace_back(Vector3(-1.0f, -1.0f, -1.0f), Vector3(-1.0f, -1.0f, 1.0f), Vector3(1.0f, -1.0f, -1.0f));
+void Scene::CreateTriangle(const Vector3& p0, const Vector3& p1, const Vector3& p2)
+{
+	Ogre::ManualObject* manualObject = m_SceneManager->createManualObject();
+	manualObject->begin(Ogre::MaterialManager::getSingleton().getDefaultMaterial());
+
+	Vector3 normal = (p1-p0).crossProduct(p2-p0);
+
+	manualObject->position(p0);
+	manualObject->normal(normal);
+
+	manualObject->position(p1);
+	manualObject->normal(normal);
+
+	manualObject->position(p2);
+	manualObject->normal(normal);
+
+	manualObject->triangle(0, 1, 2);
+	manualObject->triangle(0, 2, 1);
+
+	manualObject->end();
+
+	m_SceneManager->getRootSceneNode()->createChildSceneNode()->attachObject(manualObject);
+
+	m_Triangles.emplace_back(p0, p1, p2);
 }
 
 // TODO: Destroy SceneNode's (?)

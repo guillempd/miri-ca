@@ -21,6 +21,10 @@ public:
 	void Update(float dt);
 	OgreBites::CameraMan* GetCameraMan() { return m_CameraMan; }
 private:
+	void CreateParticle();
+	void CreatePlane(const Vector3& normal, const Vector3& pointInPlane, Ogre::MeshPtr meshPtr);
+	void CreateSphere(const Vector3& center, float radius);
+	void CreateTriangle(const Vector3& p0, const Vector3& p1, const Vector3& p2);
 	void CreateInterface();
 	void SetupLighting();
 	void SetupCamera(Ogre::RenderWindow* renderWindow);

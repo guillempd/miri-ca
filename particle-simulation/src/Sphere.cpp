@@ -7,7 +7,11 @@ Sphere::Sphere(Ogre::SceneNode* sceneNode, const Vector3& center, float radius)
 	, m_Center(center)
 	, m_Radius(radius)
 {
-	m_SceneNode->scale(radius, radius, radius);
+	if (m_SceneNode)
+	{
+		m_SceneNode->setPosition(m_Center);
+		m_SceneNode->scale(radius, radius, radius);
+	}
 }
 
 float Sphere::SignedDistance(const Vector3& point) const
