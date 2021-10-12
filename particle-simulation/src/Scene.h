@@ -9,6 +9,7 @@
 #include <OgreCameraMan.h>
 
 #include <vector>
+#include <random>
 
 class Scene
 {
@@ -23,15 +24,23 @@ private:
 	void CreateInterface();
 	void SetupLighting();
 	void SetupCamera(Ogre::RenderWindow* renderWindow);
+	void SetupMaterials();
 	void SetupEntities();
 	void CheckPlanes(Particle& particle, float dt);
 	void CheckSpheres(Particle& particle, float dt);
 	void CheckTriangles(Particle& particle, float dt); // TODO: Consider making these a template Check<Collidable>
 private:
+	// Scene elements
 	std::vector<Particle> m_Particles;
 	std::vector<Plane> m_Planes;
 	std::vector<Sphere> m_Spheres;
 	std::vector<Triangle> m_Triangles;
+	// Random materials for particles
+	std::vector<Ogre::MaterialPtr> m_Materials;
+	int m_NumMaterials;
+	std::mt19937 m_Rng;
+	std::uniform_int_distribution<int> m_UniformMaterialIndex;
+	// Particles properties management
 	Particle::PhysicalProperties m_ParticlesPhysicalProperties;
 	int m_NumParticles;
 	int m_NumActiveParticles;

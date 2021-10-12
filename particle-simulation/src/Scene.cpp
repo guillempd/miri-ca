@@ -11,6 +11,10 @@ Scene::Scene()
 	, m_Planes()
 	, m_Spheres()
 	, m_Triangles()
+	, m_Materials()
+	, m_NumMaterials(9)
+	, m_Rng()
+	, m_UniformMaterialIndex(0, m_NumMaterials-1)
 	, m_ParticlesPhysicalProperties{Vector3(0.0f, -9.8f, 0.0f), 1.0f, 0.5f, 0.5f, 5.0f}
 	, m_NumParticles(100)
 	, m_NumActiveParticles(0)
@@ -27,28 +31,21 @@ void Scene::Setup(Ogre::SceneManager* sceneManager, Ogre::RenderWindow* renderWi
 	m_SceneManager = sceneManager;
 	SetupCamera(renderWindow);
 	SetupLighting();
+	SetupMaterials();
 	SetupEntities();
 }
 
 void Scene::SetupLighting()
 {
 	m_SceneManager->setAmbientLight(Ogre::ColourValue(0.1f, 0.1f, 0.1f));
-	
-	/*Ogre::Light* redDirectionalLight = m_SceneManager->createLight(Ogre::Light::LightTypes::LT_DIRECTIONAL);
-	redDirectionalLight->setDiffuseColour(Ogre::ColourValue(0.2f, 0.0f, 0.0f));
-	redDirectionalLight->setSpecularColour(Ogre::ColourValue(0.2f, 0.0f, 0.0f));
 
-	Ogre::SceneNode* redDirectionalLightNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
-	redDirectionalLightNode->attachObject(redDirectionalLight);
-	redDirectionalLightNode->setDirection(1, 0, 0);
+	Ogre::Light* directionalLight = m_SceneManager->createLight(Ogre::Light::LightTypes::LT_DIRECTIONAL);
+	directionalLight->setDiffuseColour(0.5f, 0.5f, 0.5f);
+	directionalLight->setSpecularColour(0.5f, 0.5f, 0.5f);
 
-	Ogre::Light* blueDirectionalLight = m_SceneManager->createLight(Ogre::Light::LightTypes::LT_DIRECTIONAL);
-	blueDirectionalLight->setDiffuseColour(Ogre::ColourValue(0.0f, 0.0f, 0.2f));
-	blueDirectionalLight->setSpecularColour(Ogre::ColourValue(0.0f, 0.0f, 0.2f));
-
-	Ogre::SceneNode* blueDirectionalLightNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
-	blueDirectionalLightNode->attachObject(blueDirectionalLight);
-	blueDirectionalLightNode->setDirection(-1, 0, 0);*/
+	Ogre::SceneNode* directionalLightNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
+	directionalLightNode->attachObject(directionalLight);
+	directionalLightNode->setDirection(-0.1f, -1.0f, 0.2f);
 
 	Ogre::Light* pointLight = m_SceneManager->createLight(Ogre::Light::LightTypes::LT_POINT);
 	pointLight->setDiffuseColour(Ogre::ColourValue(0.3f, 0.3f, 0.3f));
@@ -75,13 +72,83 @@ void Scene::SetupCamera(Ogre::RenderWindow* renderWindow)
 	renderWindow->addViewport(camera);
 }
 
+void Scene::SetupMaterials()
+{
+	m_Materials.reserve(m_NumMaterials);
+
+	Ogre::MaterialPtr material;
+
+	material = Ogre::MaterialManager::getSingleton().create("Color1", "General");
+	material->setDiffuse(228.0f / 255.0f, 26.0f / 255.0f, 28.0f / 255.0f, 1.0f);
+	material->setAmbient(228.0f / 255.0f, 26.0f / 255.0f, 28.0f / 255.0f);
+	material->setSpecular(0.9f, 0.9f, 0.9f, 1.0f);
+	// material->setShininess(4.0f);
+	m_Materials.push_back(material);
+
+	material = Ogre::MaterialManager::getSingleton().create("Color2", "General");
+	material->setDiffuse(55.0f / 255.0f, 126.0f / 255.0f, 184.0f / 255.0f, 1.0f);
+	material->setAmbient(55.0f / 255.0f, 126.0f / 255.0f, 184.0f / 255.0f);
+	material->setSpecular(0.9f, 0.9f, 0.9f, 1.0f);
+	// material->setShininess(4.0f);
+	m_Materials.push_back(material);
+
+	material = Ogre::MaterialManager::getSingleton().create("Color3", "General");
+	material->setDiffuse(77.0f / 255.0f, 175.0f / 255.0f, 74.0f / 255.0f, 1.0f);
+	material->setAmbient(77.0f / 255.0f, 175.0f / 255.0f, 74.0f / 255.0f);
+	material->setSpecular(0.9f, 0.9f, 0.9f, 1.0f);
+	// material->setShininess(4.0f);
+	m_Materials.push_back(material);
+
+	material = Ogre::MaterialManager::getSingleton().create("Color4", "General");
+	material->setDiffuse(152.0f / 255.0f, 78.0f / 255.0f, 163.0f / 255.0f, 1.0f);
+	material->setAmbient(152.0f / 255.0f, 78.0f / 255.0f, 163.0f / 255.0f);
+	material->setSpecular(0.9f, 0.9f, 0.9f, 1.0f);
+	// material->setShininess(4.0f);
+	m_Materials.push_back(material);
+
+	material = Ogre::MaterialManager::getSingleton().create("Color5", "General");
+	material->setDiffuse(255.0f / 255.0f, 127.0f / 255.0f, 0.0f / 255.0f, 1.0f);
+	material->setAmbient(255.0f / 255.0f, 127.0f / 255.0f, 0.0f / 255.0f);
+	material->setSpecular(0.9f, 0.9f, 0.9f, 1.0f);
+	// material->setShininess(4.0f);
+	m_Materials.push_back(material);
+
+	material = Ogre::MaterialManager::getSingleton().create("Color6", "General");
+	material->setDiffuse(255.0f / 255.0f, 255.0f / 255.0f, 51.0f / 255.0f, 1.0f);
+	material->setAmbient(255.0f / 255.0f, 255.0f / 255.0f, 51.0f / 255.0f);
+	material->setSpecular(0.9f, 0.9f, 0.9f, 1.0f);
+	// material->setShininess(4.0f);
+	m_Materials.push_back(material);
+
+	material = Ogre::MaterialManager::getSingleton().create("Color7", "General");
+	material->setDiffuse(166.0f / 255.0f, 86.0f / 255.0f, 40.0f / 255.0f, 1.0f);
+	material->setAmbient(166.0f / 255.0f, 86.0f / 255.0f, 40.0f / 255.0f);
+	material->setSpecular(0.9f, 0.9f, 0.9f, 1.0f);
+	// material->setShininess(4.0f);
+	m_Materials.push_back(material);
+
+	material = Ogre::MaterialManager::getSingleton().create("Color8", "General");
+	material->setDiffuse(247.0f / 255.0f, 129.0f / 255.0f, 191.0f / 255.0f, 1.0f);
+	material->setAmbient(247.0f / 255.0f, 129.0f / 255.0f, 191.0f / 255.0f);
+	material->setSpecular(0.9f, 0.9f, 0.9f, 1.0f);
+	// material->setShininess(4.0f);
+	m_Materials.push_back(material);
+
+	material = Ogre::MaterialManager::getSingleton().create("Color9", "General");
+	material->setDiffuse(153.0f / 255.0f, 153.0f / 255.0f, 153.0f / 255.0f, 1.0f);
+	material->setAmbient(153.0f / 255.0f, 153.0f / 255.0f, 153.0f / 255.0f);
+	material->setSpecular(0.9f, 0.9f, 0.9f, 1.0f);
+	// material->setShininess(4.0f);
+	m_Materials.push_back(material);
+}
+
 void Scene::SetupEntities()
 {
 	m_Particles.reserve(m_NumParticles);
 	for (int i = 0; i < m_NumParticles; ++i)
 	{
 		Ogre::Entity* particleEntity = m_SceneManager->createEntity("sphere.mesh");
-		particleEntity->setMaterial(Ogre::MaterialManager::getSingleton().getDefaultMaterial());
+		particleEntity->setMaterial(m_Materials[m_UniformMaterialIndex(m_Rng)]);
 
 		Ogre::SceneNode* particleEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
 		particleEntityNode->attachObject(particleEntity);
