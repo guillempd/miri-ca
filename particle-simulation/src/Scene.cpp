@@ -2,6 +2,8 @@
 
 #include <imgui.h>
 
+#include <limits>
+
 using Ogre::Vector3;
 
 Scene::Scene()
@@ -13,6 +15,10 @@ Scene::Scene()
 	, m_NumParticles(100)
 	, m_NumActiveParticles(0)
 	, m_ElapsedTime(0.0f)
+	, m_SceneManager(nullptr)
+	, m_CameraMan(nullptr)
+	, m_SolverMethod(Particle::SolverMethod::Euler)
+	, m_GenerationType(Particle::GenerationType::Random)
 {
 }
 
@@ -28,7 +34,7 @@ void Scene::SetupLighting()
 {
 	m_SceneManager->setAmbientLight(Ogre::ColourValue(0.1f, 0.1f, 0.1f));
 	
-	Ogre::Light* redDirectionalLight = m_SceneManager->createLight(Ogre::Light::LightTypes::LT_DIRECTIONAL);
+	/*Ogre::Light* redDirectionalLight = m_SceneManager->createLight(Ogre::Light::LightTypes::LT_DIRECTIONAL);
 	redDirectionalLight->setDiffuseColour(Ogre::ColourValue(0.2f, 0.0f, 0.0f));
 	redDirectionalLight->setSpecularColour(Ogre::ColourValue(0.2f, 0.0f, 0.0f));
 
@@ -42,8 +48,7 @@ void Scene::SetupLighting()
 
 	Ogre::SceneNode* blueDirectionalLightNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
 	blueDirectionalLightNode->attachObject(blueDirectionalLight);
-	blueDirectionalLightNode->setDirection(-1, 0, 0);
-
+	blueDirectionalLightNode->setDirection(-1, 0, 0);*/
 
 	Ogre::Light* pointLight = m_SceneManager->createLight(Ogre::Light::LightTypes::LT_POINT);
 	pointLight->setDiffuseColour(Ogre::ColourValue(0.3f, 0.3f, 0.3f));
@@ -59,7 +64,7 @@ void Scene::SetupCamera(Ogre::RenderWindow* renderWindow)
 
 	Ogre::SceneNode* cameraNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
 	cameraNode->attachObject(camera);
-	cameraNode->setPosition(0, 0, 15);
+	cameraNode->setPosition(0, 0, 5);
 	cameraNode->lookAt(Ogre::Vector3(0, 0, -1), Ogre::Node::TS_PARENT);
 
 	m_CameraMan = new OgreBites::CameraMan(cameraNode);
@@ -149,21 +154,7 @@ Scene::~Scene()
 
 void Scene::Update(float dt)
 {
-	if (ImGui::Begin("Settings"))
-	{
-		ImGui::Text("Solver Method");
-		ImGui::RadioButton("Euler Original", reinterpret_cast<int*>(&m_SolverMethod), static_cast<int>(Particle::SolverMethod::Euler));
-		ImGui::RadioButton("Euler Semi Implicit", reinterpret_cast<int*>(&m_SolverMethod), static_cast<int>(Particle::SolverMethod::EulerSemi));
-		ImGui::RadioButton("Verlet", reinterpret_cast<int*>(&m_SolverMethod), static_cast<int>(Particle::SolverMethod::Verlet));
-
-		ImGui::Separator();
-
-		ImGui::Text("Particle Physical Properties");
-		ImGui::SliderFloat("Mass", &m_ParticlesPhysicalProperties.mass, 0.1f, 10.0f);
-		ImGui::SliderFloat("Bouncing Coefficient", &m_ParticlesPhysicalProperties.bouncingCoefficient, 0.1f, 1.0f);
-		ImGui::SliderFloat("Friction Coefficient", &m_ParticlesPhysicalProperties.frictionCoefficient, 0.1f, 1.0f);
-	}
-	ImGui::End();
+	CreateInterface();
 
 	m_ElapsedTime += dt;
 	m_NumActiveParticles = static_cast<int>(m_NumParticles * (m_ElapsedTime / m_ParticlesPhysicalProperties.lifetime));
@@ -177,14 +168,46 @@ void Scene::Update(float dt)
 		if (actualDt <= 0.0f)
 		{
 			actualDt = -actualDt;
-			particle.Reset(Particle::GenerationType::Random, m_ParticlesPhysicalProperties.lifetime); // What dt to pass here (?)
+			particle.Reset(m_GenerationType, m_ParticlesPhysicalProperties.lifetime);
 		}
 		particle.UpdatePosition(actualDt, m_SolverMethod, m_ParticlesPhysicalProperties);
 		CheckPlanes(particle, actualDt);
 		CheckSpheres(particle, actualDt);
 		CheckTriangles(particle, actualDt);
 	}
+}
 
+void Scene::CreateInterface()
+{
+	if (ImGui::Begin("Settings"))
+	{
+		ImGui::Text("Solver Method");
+		ImGui::RadioButton("Euler Original", reinterpret_cast<int*>(&m_SolverMethod), static_cast<int>(Particle::SolverMethod::Euler));
+		ImGui::RadioButton("Euler Semi Implicit", reinterpret_cast<int*>(&m_SolverMethod), static_cast<int>(Particle::SolverMethod::EulerSemi));
+		ImGui::RadioButton("Verlet", reinterpret_cast<int*>(&m_SolverMethod), static_cast<int>(Particle::SolverMethod::Verlet));
+
+		ImGui::Separator();
+
+		ImGuiSliderFlags flags = ImGuiSliderFlags_AlwaysClamp;
+
+		ImGui::Text("Particle Properties");
+		ImGui::DragFloat("Mass", &m_ParticlesPhysicalProperties.mass, 0.05f, std::numeric_limits<float>::min(), std::numeric_limits<float>::max(), "%.3f", flags);
+		ImGui::SliderFloat("Bouncing Coefficient", &m_ParticlesPhysicalProperties.bouncingCoefficient, 0.0f, 1.0f, "%.3f", flags);
+		ImGui::SliderFloat("Friction Coefficient", &m_ParticlesPhysicalProperties.frictionCoefficient, 0.0f, 1.0f, "%.3f", flags);
+		ImGui::DragFloat("Lifetime", &m_ParticlesPhysicalProperties.lifetime, 0.05f, 1.0f, std::numeric_limits<float>::max(), "%.3f", flags);
+		ImGui::DragFloat3("Gravity", m_ParticlesPhysicalProperties.gravity.ptr(), 0.05f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max(), "%.3f", flags);
+
+		ImGui::Separator();
+
+		ImGui::Text("Generation Method");
+		ImGui::RadioButton("Random", reinterpret_cast<int*>(&m_GenerationType), static_cast<int>(Particle::GenerationType::Random));
+		ImGui::RadioButton("Cascade", reinterpret_cast<int*>(&m_GenerationType), static_cast<int>(Particle::GenerationType::Cascade));
+		ImGui::RadioButton("Fountain", reinterpret_cast<int*>(&m_GenerationType), static_cast<int>(Particle::GenerationType::Fountain));
+
+		//ImGui::Separator();
+		// TODO: Add controls for number of particles, probably should reset the scene after changing this
+	}
+	ImGui::End();
 }
 
 void Scene::CheckPlanes(Particle& particle, float dt)

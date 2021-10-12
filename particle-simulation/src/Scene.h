@@ -20,6 +20,7 @@ public:
 	void Update(float dt);
 	OgreBites::CameraMan* GetCameraMan() { return m_CameraMan; }
 private:
+	void CreateInterface();
 	void SetupLighting();
 	void SetupCamera(Ogre::RenderWindow* renderWindow);
 	void SetupEntities();
@@ -38,5 +39,6 @@ private:
 	Ogre::SceneManager* m_SceneManager;
 	OgreBites::CameraMan* m_CameraMan;
 	Particle::SolverMethod m_SolverMethod;
+	Particle::GenerationType m_GenerationType;
 };
 
