@@ -45,31 +45,38 @@ float Particle::UpdateLifetime(float dt)
 
 void Particle::UpdatePosition(float dt, SolverMethod method, const PhysicalProperties& properties)
 {
+	m_PreviousPosition = m_CorrectedPreviousPosition;
 	Vector3 currentAcceleration = CurrentForce(properties) / properties.mass;
 	switch (method)
 	{
 	case SolverMethod::Euler:
 	{
-		m_PreviousPosition = m_CurrentPosition;
+		SavePreviousPosition();
 		m_CurrentPosition += m_CurrentVelocity * dt;
 		m_CurrentVelocity += currentAcceleration * dt;
 	} break;
 	case SolverMethod::EulerSemi:
 	{
-		m_PreviousPosition = m_CurrentPosition;
+		SavePreviousPosition();
 		m_CurrentVelocity += currentAcceleration * dt;
 		m_CurrentPosition += m_CurrentVelocity * dt;
 	} break;
 	case SolverMethod::Verlet:
 	{
 		Vector3 positionDelta = m_CurrentPosition - m_PreviousPosition;
-		m_PreviousPosition = m_CurrentPosition;
+		SavePreviousPosition();
 		m_CurrentPosition += positionDelta + currentAcceleration * dt * dt;
 		m_CurrentVelocity = (m_CurrentPosition - m_PreviousPosition) / dt;
 	} break;
 	}
 
 	UpdateSceneNode();
+}
+
+void Particle::SavePreviousPosition()
+{
+	m_PreviousPosition = m_CurrentPosition;
+	m_CorrectedPreviousPosition = m_PreviousPosition;
 }
 
 void Particle::CheckAndResolveCollision(const Plane& plane, const PhysicalProperties& properties, float dt)
@@ -141,7 +148,7 @@ void Particle::ResolveCollision(const Plane& plane, const PhysicalProperties& pr
 
 void Particle::ResolveCollision(const Sphere& sphere, const PhysicalProperties& properties, float dt)
 {
-	Vector3 contactPoint = sphere.ContactPoint(m_PreviousPosition, m_CurrentPosition);
+	Vector3 contactPoint = sphere.ContactPoint(m_CorrectedPreviousPosition, m_CurrentPosition);
 	Plane normal = Plane(nullptr, contactPoint - sphere.GetCenter(), contactPoint);
 	ResolveCollision(normal, properties, dt);
 }
@@ -158,5 +165,5 @@ void Particle::UpdateSceneNode()
 
 void Particle::CorrectPreviousPosition(float dt)
 {
-	m_PreviousPosition = m_CurrentPosition - m_CurrentVelocity * dt;
+	m_CorrectedPreviousPosition = m_CurrentPosition - m_CurrentVelocity * dt;
 }

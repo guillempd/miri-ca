@@ -160,8 +160,9 @@ void Scene::SetupEntities()
 	m_Spheres.reserve(1);
 	CreateSphere(Vector3(0.0f, -0.50f, 0.0f), 0.25f);
 
-	m_Triangles.reserve(1);
+	m_Triangles.reserve(2);
 	CreateTriangle(Vector3(0.5f, 0.0f, 0.0f), Vector3(-0.5f, 0.1f, 0.5f), Vector3(-0.5f, 0.2f, -0.5f));
+	CreateTriangle(Vector3(-1.0f, -1.0f, -1.0f), Vector3(-1.0f, -1.0f, 1.0f), Vector3(1.0f, -1.0f, -1.0f)); // Redundant triangle for testing coplanar collisions
 }
 
 void Scene::CreateParticle()

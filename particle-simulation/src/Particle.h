@@ -40,11 +40,13 @@ private:
 	void ResolveCollision(const Triangle& triangle, const PhysicalProperties& properties, float dt);
 	void UpdateSceneNode();
 	void CorrectPreviousPosition(float dt);
+	void SavePreviousPosition();
 private:
 	Ogre::SceneNode* m_SceneNode;
 	Vector3 m_CurrentPosition;
 	Vector3 m_PreviousPosition;
 	Vector3 m_CurrentVelocity;
+	Vector3 m_CorrectedPreviousPosition;
 	float m_LifetimeLeft;
 	static std::minstd_rand s_Rng;
 	static std::uniform_real_distribution<float> s_UniformFloat;
