@@ -257,6 +257,8 @@ void Scene::Update(float dt)
 
 void Scene::CreateInterface()
 {
+	ImGui::ShowMetricsWindow(); // For fps counter
+
 	if (ImGui::Begin("Settings"))
 	{
 		ImGui::Text("Solver Method");
