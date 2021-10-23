@@ -16,24 +16,23 @@ class Scene
 	using Vector3 = Ogre::Vector3;
 public:
 	Scene();
-	~Scene();
+	virtual ~Scene(); // = default (?)
 	void Setup(Ogre::SceneManager* sceneManager, Ogre::RenderWindow* renderWindow);
-	void Update(float dt);
+	virtual void Update(float dt) = 0;
 	OgreBites::CameraMan* GetCameraMan() { return m_CameraMan; }
-private:
+protected:
+	void SetupCamera(Ogre::RenderWindow* renderWindow);
+	void SetupLighting();
+	void SetupMaterials();
+	virtual void SetupEntities() = 0;
 	void CreateParticle();
 	void CreatePlane(const Vector3& normal, const Vector3& pointInPlane, Ogre::MeshPtr meshPtr);
 	void CreateSphere(const Vector3& center, float radius);
 	void CreateTriangle(const Vector3& p0, const Vector3& p1, const Vector3& p2);
-	void CreateInterface();
-	void SetupLighting();
-	void SetupCamera(Ogre::RenderWindow* renderWindow);
-	void SetupMaterials();
-	void SetupEntities();
 	void CheckPlanes(Particle& particle, float dt);
 	void CheckSpheres(Particle& particle, float dt);
 	void CheckTriangles(Particle& particle, float dt); // TODO: Consider making these a template Check<Collidable>
-private:
+protected:
 	// Scene elements
 	std::vector<Particle> m_Particles;
 	std::vector<Plane> m_Planes;

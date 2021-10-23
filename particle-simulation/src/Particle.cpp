@@ -29,7 +29,7 @@ void Particle::Reset(GenerationType generationType, float lifetime)
 	} break;
 	case GenerationType::Fountain:
 	{
-		m_CurrentPosition = Vector3(0.0f, -0.9, 0.0f);
+		m_CurrentPosition = Vector3(0.0f, -0.9f, 0.0f);
 		m_CurrentVelocity = Vector3(s_UniformFloat(s_Rng), 5.0f, s_UniformFloat(s_Rng));
 	} break;
 	}

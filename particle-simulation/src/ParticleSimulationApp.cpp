@@ -1,5 +1,9 @@
 #include "ParticleSimulationApp.h"
 
+#include "BoxScene.h"
+
+#include <imgui.h>
+
 #include <Ogre.h>
 #include <OgreOverlay.h>
 #include <OgreOverlaySystem.h>
@@ -9,8 +13,11 @@
 #include <vector>
 
 ParticleSimulationApp::ParticleSimulationApp()
-	: OgreBites::ApplicationContext("ParticleSimulationApp")
+    : OgreBites::ApplicationContext("ParticleSimulationApp")
+    , m_SceneType(SceneType::BOX)
 {
+    // TODO: Make a switch according to m_SceneType
+    m_Scene = new BoxScene();
 }
 
 // TODO: Correctly delete al resources that are generated
@@ -28,9 +35,9 @@ void ParticleSimulationApp::setup()
 
     Ogre::RTShader::ShaderGenerator::getSingleton().addSceneManager(m_SceneManager);
 
-    m_Scene.Setup(m_SceneManager, getRenderWindow());
+    m_Scene->Setup(m_SceneManager, getRenderWindow());
 
-    std::vector<InputListener*> chain = {m_ImGuiInputListener, this, m_Scene.GetCameraMan()};
+    std::vector<InputListener*> chain = {m_ImGuiInputListener, this, m_Scene->GetCameraMan()};
     OgreBites::InputListenerChain *inputListenerChain = new OgreBites::InputListenerChain(chain);
     addInputListener(inputListenerChain);
 }
@@ -56,7 +63,8 @@ bool ParticleSimulationApp::frameStarted(const Ogre::FrameEvent& event)
 {
     OgreBites::ApplicationContext::frameStarted(event);
     Ogre::ImGuiOverlay::NewFrame();
-    m_Scene.Update(event.timeSinceLastFrame);
+    CreateSceneSelectionInterface();
+    m_Scene->Update(event.timeSinceLastFrame);
     return true; // TODO: What should this return value be (?)
 }
 
@@ -65,4 +73,20 @@ bool ParticleSimulationApp::frameEnded(const Ogre::FrameEvent& event)
     OgreBites::ApplicationContext::frameEnded(event);
     ImGui::EndFrame();
     return true; // TODO: What should this return value be (?)
+}
+
+void ParticleSimulationApp::CreateSceneSelectionInterface()
+{
+    SceneType previousSceneType = m_SceneType;
+    if (ImGui::Begin("Select Scene"))
+    {
+        ImGui::RadioButton("Box Scene", reinterpret_cast<int*>(&m_SceneType), static_cast<int>(SceneType::BOX));
+        ImGui::RadioButton("Rope Scene", reinterpret_cast<int*>(&m_SceneType), static_cast<int>(SceneType::ROPE));
+    }
+    ImGui::End();
+
+    if (m_SceneType != previousSceneType)
+    {
+        // TODO: Switch to new scene type (delete and create)
+    }
 }

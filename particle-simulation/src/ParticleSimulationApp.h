@@ -12,6 +12,8 @@ class ParticleSimulationApp
 	, public OgreBites::InputListener
 {
 public:
+	enum class SceneType {BOX, ROPE};
+public:
 	ParticleSimulationApp();
 	void setup() override;
 	void shutdown() override;
@@ -19,7 +21,10 @@ public:
 	bool frameStarted(const Ogre::FrameEvent& event) override;
 	bool frameEnded(const Ogre::FrameEvent& event) override;
 private:
-	Scene m_Scene;
+	void CreateSceneSelectionInterface();
+private:
+	SceneType m_SceneType;
+	Scene* m_Scene;
 	Ogre::SceneManager* m_SceneManager;
 	OgreBites::ImGuiInputListener* m_ImGuiInputListener;
 	Ogre::ImGuiOverlay* m_ImGuiOverlay;
