@@ -15,7 +15,7 @@ class Scene
 {
 	using Vector3 = Ogre::Vector3;
 public:
-	Scene();
+	Scene(std::vector<Ogre::MaterialPtr>& materials, Ogre::MeshPtr planeMesh);
 	virtual ~Scene(); // = default (?)
 	void Setup(Ogre::SceneManager* sceneManager, Ogre::RenderWindow* renderWindow);
 	virtual void Update(float dt) = 0;
@@ -23,10 +23,9 @@ public:
 protected:
 	void SetupCamera(Ogre::RenderWindow* renderWindow);
 	void SetupLighting();
-	void SetupMaterials();
 	virtual void SetupEntities() = 0;
 	void CreateParticle();
-	void CreatePlane(const Vector3& normal, const Vector3& pointInPlane, Ogre::MeshPtr meshPtr);
+	void CreatePlane(const Vector3& normal, const Vector3& pointInPlane);
 	void CreateSphere(const Vector3& center, float radius);
 	void CreateTriangle(const Vector3& p0, const Vector3& p1, const Vector3& p2);
 	void CheckPlanes(Particle& particle, float dt);
@@ -38,11 +37,13 @@ protected:
 	std::vector<Plane> m_Planes;
 	std::vector<Sphere> m_Spheres;
 	std::vector<Triangle> m_Triangles;
+	Ogre::Camera* m_Camera;
 	// Random materials for particles
-	std::vector<Ogre::MaterialPtr> m_Materials;
-	int m_NumMaterials;
+	std::vector<Ogre::MaterialPtr>& m_Materials;
 	std::mt19937 m_Rng;
 	std::uniform_int_distribution<int> m_UniformMaterialIndex;
+	// Resources
+	Ogre::MeshPtr m_PlaneMesh;
 	// Particles properties management
 	Particle::PhysicalProperties m_ParticlesPhysicalProperties;
 	int m_NumParticles;

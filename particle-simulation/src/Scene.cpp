@@ -6,15 +6,16 @@
 
 using Ogre::Vector3;
 
-Scene::Scene()
+Scene::Scene(std::vector<Ogre::MaterialPtr>& materials, Ogre::MeshPtr planeMesh)
 	: m_Particles()
 	, m_Planes()
 	, m_Spheres()
 	, m_Triangles()
-	, m_Materials()
-	, m_NumMaterials(9)
+	, m_Camera(nullptr)
+	, m_Materials(materials)
 	, m_Rng()
-	, m_UniformMaterialIndex(0, m_NumMaterials-1)
+	, m_UniformMaterialIndex(0, m_Materials.size()-1)
+	, m_PlaneMesh(planeMesh)
 	, m_ParticlesPhysicalProperties{Vector3(0.0f, -9.8f, 0.0f), 1.0f, 0.5f, 0.5f, 5.0f}
 	, m_NumParticles(100)
 	, m_NumActiveParticles(0)
@@ -31,7 +32,6 @@ void Scene::Setup(Ogre::SceneManager* sceneManager, Ogre::RenderWindow* renderWi
 	m_SceneManager = sceneManager;
 	SetupCamera(renderWindow);
 	SetupLighting();
-	SetupMaterials();
 	SetupEntities();
 }
 
@@ -55,12 +55,21 @@ void Scene::SetupLighting()
 
 void Scene::SetupCamera(Ogre::RenderWindow* renderWindow)
 {
-	Ogre::Camera* camera = m_SceneManager->createCamera("Camera");
-	camera->setNearClipDistance(0.1f);
-	camera->setAutoAspectRatio(true);
+	if (m_SceneManager->hasCamera("Camera"))
+	{
+		m_Camera = m_SceneManager->getCamera("Camera");
+	}
+	else
+	{
+		m_Camera = m_SceneManager->createCamera("Camera");
+		renderWindow->addViewport(m_Camera);
+	}
+
+	m_Camera->setNearClipDistance(0.1f);
+	m_Camera->setAutoAspectRatio(true);
 
 	Ogre::SceneNode* cameraNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
-	cameraNode->attachObject(camera);
+	cameraNode->attachObject(m_Camera);
 	cameraNode->setPosition(0, 0, 5);
 	cameraNode->lookAt(Ogre::Vector3(0, 0, -1), Ogre::Node::TS_PARENT);
 
@@ -68,78 +77,6 @@ void Scene::SetupCamera(Ogre::RenderWindow* renderWindow)
 	m_CameraMan->setStyle(OgreBites::CS_ORBIT);
 	m_CameraMan->setTarget(m_SceneManager->getRootSceneNode());
 	m_CameraMan->setTopSpeed(10.0f); // TODO: Set appropriately
-
-	renderWindow->addViewport(camera);
-}
-
-void Scene::SetupMaterials()
-{
-	m_Materials.reserve(m_NumMaterials);
-
-	Ogre::MaterialPtr material;
-
-	material = Ogre::MaterialManager::getSingleton().create("Color1", "General");
-	material->setDiffuse(228.0f / 255.0f, 26.0f / 255.0f, 28.0f / 255.0f, 1.0f);
-	material->setAmbient(228.0f / 255.0f, 26.0f / 255.0f, 28.0f / 255.0f);
-	material->setSpecular(0.9f, 0.9f, 0.9f, 1.0f);
-	// material->setShininess(4.0f);
-	m_Materials.push_back(material);
-
-	material = Ogre::MaterialManager::getSingleton().create("Color2", "General");
-	material->setDiffuse(55.0f / 255.0f, 126.0f / 255.0f, 184.0f / 255.0f, 1.0f);
-	material->setAmbient(55.0f / 255.0f, 126.0f / 255.0f, 184.0f / 255.0f);
-	material->setSpecular(0.9f, 0.9f, 0.9f, 1.0f);
-	// material->setShininess(4.0f);
-	m_Materials.push_back(material);
-
-	material = Ogre::MaterialManager::getSingleton().create("Color3", "General");
-	material->setDiffuse(77.0f / 255.0f, 175.0f / 255.0f, 74.0f / 255.0f, 1.0f);
-	material->setAmbient(77.0f / 255.0f, 175.0f / 255.0f, 74.0f / 255.0f);
-	material->setSpecular(0.9f, 0.9f, 0.9f, 1.0f);
-	// material->setShininess(4.0f);
-	m_Materials.push_back(material);
-
-	material = Ogre::MaterialManager::getSingleton().create("Color4", "General");
-	material->setDiffuse(152.0f / 255.0f, 78.0f / 255.0f, 163.0f / 255.0f, 1.0f);
-	material->setAmbient(152.0f / 255.0f, 78.0f / 255.0f, 163.0f / 255.0f);
-	material->setSpecular(0.9f, 0.9f, 0.9f, 1.0f);
-	// material->setShininess(4.0f);
-	m_Materials.push_back(material);
-
-	material = Ogre::MaterialManager::getSingleton().create("Color5", "General");
-	material->setDiffuse(255.0f / 255.0f, 127.0f / 255.0f, 0.0f / 255.0f, 1.0f);
-	material->setAmbient(255.0f / 255.0f, 127.0f / 255.0f, 0.0f / 255.0f);
-	material->setSpecular(0.9f, 0.9f, 0.9f, 1.0f);
-	// material->setShininess(4.0f);
-	m_Materials.push_back(material);
-
-	material = Ogre::MaterialManager::getSingleton().create("Color6", "General");
-	material->setDiffuse(255.0f / 255.0f, 255.0f / 255.0f, 51.0f / 255.0f, 1.0f);
-	material->setAmbient(255.0f / 255.0f, 255.0f / 255.0f, 51.0f / 255.0f);
-	material->setSpecular(0.9f, 0.9f, 0.9f, 1.0f);
-	// material->setShininess(4.0f);
-	m_Materials.push_back(material);
-
-	material = Ogre::MaterialManager::getSingleton().create("Color7", "General");
-	material->setDiffuse(166.0f / 255.0f, 86.0f / 255.0f, 40.0f / 255.0f, 1.0f);
-	material->setAmbient(166.0f / 255.0f, 86.0f / 255.0f, 40.0f / 255.0f);
-	material->setSpecular(0.9f, 0.9f, 0.9f, 1.0f);
-	// material->setShininess(4.0f);
-	m_Materials.push_back(material);
-
-	material = Ogre::MaterialManager::getSingleton().create("Color8", "General");
-	material->setDiffuse(247.0f / 255.0f, 129.0f / 255.0f, 191.0f / 255.0f, 1.0f);
-	material->setAmbient(247.0f / 255.0f, 129.0f / 255.0f, 191.0f / 255.0f);
-	material->setSpecular(0.9f, 0.9f, 0.9f, 1.0f);
-	// material->setShininess(4.0f);
-	m_Materials.push_back(material);
-
-	material = Ogre::MaterialManager::getSingleton().create("Color9", "General");
-	material->setDiffuse(153.0f / 255.0f, 153.0f / 255.0f, 153.0f / 255.0f, 1.0f);
-	material->setAmbient(153.0f / 255.0f, 153.0f / 255.0f, 153.0f / 255.0f);
-	material->setSpecular(0.9f, 0.9f, 0.9f, 1.0f);
-	// material->setShininess(4.0f);
-	m_Materials.push_back(material);
 }
 
 void Scene::CreateParticle()
@@ -154,9 +91,9 @@ void Scene::CreateParticle()
 	m_Particles.emplace_back(particleEntityNode);
 }
 
-void Scene::CreatePlane(const Vector3 &normal, const Vector3& pointInPlane, Ogre::MeshPtr meshPtr)
+void Scene::CreatePlane(const Vector3 &normal, const Vector3& pointInPlane)
 {
-	Ogre::Entity* planeEntity = m_SceneManager->createEntity(meshPtr);
+	Ogre::Entity* planeEntity = m_SceneManager->createEntity(m_PlaneMesh);
 	Ogre::SceneNode* planeEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
 	planeEntityNode->attachObject(planeEntity);
 	m_Planes.emplace_back(planeEntityNode, normal, pointInPlane);
@@ -201,9 +138,10 @@ void Scene::CreateTriangle(const Vector3& p0, const Vector3& p1, const Vector3& 
 // TODO: Do this in shutdown
 Scene::~Scene()
 {
-	// m_SceneManager->destroyAllLights();
-	// m_SceneManager->destroyAllCameras();
-	// m_SceneManager->destroyAllEntities();
+	m_Camera->detachFromParent();
+	m_SceneManager->destroyAllLights();
+	m_SceneManager->destroyAllEntities();
+	m_SceneManager->destroyAllManualObjects();
 	delete m_CameraMan;
 }
 

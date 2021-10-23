@@ -4,6 +4,11 @@
 
 using Ogre::Vector3;
 
+BoxScene::BoxScene(std::vector<Ogre::MaterialPtr>& materials, Ogre::MeshPtr planeMesh)
+	: Scene(materials, planeMesh)
+{
+}
+
 void BoxScene::Update(float dt)
 {
 	CreateInterface();
@@ -35,14 +40,13 @@ void BoxScene::SetupEntities()
 	for (int i = 0; i < m_NumParticles; ++i)
 		CreateParticle();
 
-	Ogre::MeshPtr meshPtr = Ogre::MeshManager::getSingleton().createPlane("Plane", "General", Ogre::Plane(Vector3(0.0f, 0.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f)), 2, 2);
 	m_Planes.reserve(6);
-	CreatePlane(Vector3(0.0f, -1.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f), meshPtr);
-	CreatePlane(Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f), meshPtr);
-	CreatePlane(Vector3(-1.0f, 0.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f), meshPtr);
-	CreatePlane(Vector3(1.0f, 0.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f), meshPtr);
-	CreatePlane(Vector3(0.0f, 0.0f, 1.0f), Vector3(0.0f, 0.0f, 1.0f), meshPtr);
-	CreatePlane(Vector3(0.0f, 0.0f, -1.0f), Vector3(0.0f, 0.0f, -1.0f), meshPtr);
+	CreatePlane(Vector3(0.0f, -1.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f));
+	CreatePlane(Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f));
+	CreatePlane(Vector3(-1.0f, 0.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f));
+	CreatePlane(Vector3(1.0f, 0.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f));
+	CreatePlane(Vector3(0.0f, 0.0f, 1.0f), Vector3(0.0f, 0.0f, 1.0f));
+	CreatePlane(Vector3(0.0f, 0.0f, -1.0f), Vector3(0.0f, 0.0f, -1.0f));
 
 	m_Spheres.reserve(1);
 	CreateSphere(Vector3(0.0f, -0.50f, 0.0f), 0.25f);
