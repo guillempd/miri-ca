@@ -30,8 +30,17 @@ public:
 	void CheckAndResolveCollision(const Plane &plane, const PhysicalProperties& properties, float dt);
 	void CheckAndResolveCollision(const Sphere &sphere, const PhysicalProperties& properties, float dt);
 	void CheckAndResolveCollision(const Triangle& triangle, const PhysicalProperties& properties, float dt);
+	void AddForce(const Vector3& force);
+	Vector3 GetPosition() const { return m_CurrentPosition; }
+	void SetPosition(const Vector3& position) {
+		m_SceneNode->setVisible(true);
+		m_CurrentForce = Vector3(0.0f, 0.0f, 0.0f);
+		m_CurrentVelocity = Vector3(0.0f, 0.0f, 0.0f);
+		m_CurrentPosition = position;
+		CorrectPreviousPosition(1.0f / 144.0f);
+	} // TODO: Better do this
 private:
-	Vector3 CurrentForce(const PhysicalProperties& properties) const;
+	Vector3 CurrentForce(const PhysicalProperties& properties);
 	bool CheckCollision(const Plane& plane) const;
 	bool CheckCollision(const Sphere& sphere) const;
 	bool CheckCollision(const Triangle& triangle) const;
@@ -47,6 +56,7 @@ private:
 	Vector3 m_PreviousPosition;
 	Vector3 m_CurrentVelocity;
 	Vector3 m_CorrectedPreviousPosition;
+	Vector3 m_CurrentForce;
 	float m_LifetimeLeft;
 	static std::minstd_rand s_Rng;
 	static std::uniform_real_distribution<float> s_UniformFloat;

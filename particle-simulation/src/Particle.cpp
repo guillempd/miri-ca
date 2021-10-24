@@ -15,6 +15,7 @@ void Particle::Reset(GenerationType generationType, float lifetime)
 {
 	m_SceneNode->setVisible(true);
 	m_LifetimeLeft += lifetime; // So it takes into account the small part of lifetime it had left
+	m_CurrentForce = Vector3(0.0f, 0.0f, 0.0f);
 	switch (generationType)
 	{
 	case GenerationType::Random:
@@ -69,7 +70,6 @@ void Particle::UpdatePosition(float dt, SolverMethod method, const PhysicalPrope
 		m_CurrentVelocity = (m_CurrentPosition - m_PreviousPosition) / dt;
 	} break;
 	}
-
 	UpdateSceneNode();
 }
 
@@ -106,9 +106,16 @@ void Particle::CheckAndResolveCollision(const Triangle& triangle, const Physical
 	}
 }
 
-Vector3 Particle::CurrentForce(const PhysicalProperties &properties) const
+void Particle::AddForce(const Vector3& force)
 {
-	return properties.mass * properties.gravity;
+	m_CurrentForce += force;
+}
+
+Vector3 Particle::CurrentForce(const PhysicalProperties &properties)
+{
+	Vector3 currentForce = m_CurrentForce;
+	m_CurrentForce = Vector3(0.0f, 0.0f, 0.0f); // TODO: Be careful about this, current force is reseted after using this
+	return currentForce + properties.mass * properties.gravity;
 }
 
 bool Particle::CheckCollision(const Plane& plane) const

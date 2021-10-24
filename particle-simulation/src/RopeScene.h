@@ -14,5 +14,7 @@ public:
 private:
 	void SetupEntities() override;
 	void CreateInterface();
+private:
+	float m_ElasticityK;
+	float m_RestLength;
 };
-
