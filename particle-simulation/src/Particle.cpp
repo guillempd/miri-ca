@@ -9,7 +9,6 @@ Particle::Particle(Ogre::SceneNode* sceneNode)
 {
 	m_LifetimeLeft = 0.0f;
 	m_SceneNode->setVisible(false);
-	m_Fixed = false;
 }
 
 void Particle::Reset(GenerationType generationType, float lifetime)
@@ -45,11 +44,8 @@ float Particle::UpdateLifetime(float dt)
 	return dt;
 }
 
-void Particle::UpdatePosition(float dt, SolverMethod method, const PhysicalProperties& properties)
+void Particle::UpdatePosition(float dt, SolverMethod method, const Properties& properties)
 {
-	if (m_Fixed) return;
-
-	// !m_Fixed
 	m_PreviousPosition = m_CorrectedPreviousPosition;
 	Vector3 currentAcceleration = CurrentForce(properties) / properties.mass;
 	switch (method)
@@ -83,11 +79,8 @@ void Particle::SavePreviousPosition()
 	m_CorrectedPreviousPosition = m_PreviousPosition;
 }
 
-void Particle::CheckAndResolveCollision(const Plane& plane, const PhysicalProperties& properties, float dt)
+void Particle::CheckAndResolveCollision(const Plane& plane, const Properties& properties, float dt)
 {
-	if (m_Fixed) return;
-
-	// !m_Fixed
 	if (CheckCollision(plane))
 	{
 		ResolveCollision(plane, properties, dt);
@@ -95,11 +88,8 @@ void Particle::CheckAndResolveCollision(const Plane& plane, const PhysicalProper
 	}
 }
 
-void Particle::CheckAndResolveCollision(const Sphere& sphere, const PhysicalProperties& properties, float dt)
+void Particle::CheckAndResolveCollision(const Sphere& sphere, const Properties& properties, float dt)
 {
-	if (m_Fixed) return;
-
-	// !m_Fixed
 	if (CheckCollision(sphere))
 	{
 		ResolveCollision(sphere, properties, dt);
@@ -107,11 +97,8 @@ void Particle::CheckAndResolveCollision(const Sphere& sphere, const PhysicalProp
 	}
 }
 
-void Particle::CheckAndResolveCollision(const Triangle& triangle, const PhysicalProperties& properties, float dt)
+void Particle::CheckAndResolveCollision(const Triangle& triangle, const Properties& properties, float dt)
 {
-	if (m_Fixed) return;
-
-	// !m_Fixed
 	if (CheckCollision(triangle))
 	{
 		ResolveCollision(triangle, properties, dt);
@@ -124,7 +111,7 @@ void Particle::AddForce(const Vector3& force)
 	m_CurrentForce += force;
 }
 
-Vector3 Particle::CurrentForce(const PhysicalProperties &properties)
+Vector3 Particle::CurrentForce(const Properties &properties)
 {
 	Vector3 currentForce = m_CurrentForce;
 	m_CurrentForce = Vector3(0.0f, 0.0f, 0.0f); // TODO: Be careful about this, current force is reseted after using this
@@ -154,7 +141,7 @@ bool Particle::CheckCollision(const Triangle& triangle) const
 	return triangle.Contains(contactPoint);
 }
 
-void Particle::ResolveCollision(const Plane& plane, const PhysicalProperties& properties, float dt)
+void Particle::ResolveCollision(const Plane& plane, const Properties& properties, float dt)
 {
 	m_CurrentPosition = m_CurrentPosition - (1 + properties.bouncingCoefficient) * (plane.GetOffset() + plane.GetNormal().dotProduct(m_CurrentPosition)) * plane.GetNormal();
 	m_CurrentVelocity = m_CurrentVelocity - (1 + properties.bouncingCoefficient) * plane.GetNormal().dotProduct(m_CurrentVelocity) * plane.GetNormal();
@@ -166,14 +153,14 @@ void Particle::ResolveCollision(const Plane& plane, const PhysicalProperties& pr
 	CorrectPreviousPosition(dt);
 }
 
-void Particle::ResolveCollision(const Sphere& sphere, const PhysicalProperties& properties, float dt)
+void Particle::ResolveCollision(const Sphere& sphere, const Properties& properties, float dt)
 {
 	Vector3 contactPoint = sphere.ContactPoint(m_CorrectedPreviousPosition, m_CurrentPosition);
 	Plane normal = Plane(nullptr, contactPoint - sphere.GetCenter(), contactPoint);
 	ResolveCollision(normal, properties, dt);
 }
 
-void Particle::ResolveCollision(const Triangle& triangle, const PhysicalProperties& properties, float dt)
+void Particle::ResolveCollision(const Triangle& triangle, const Properties& properties, float dt)
 {
 	ResolveCollision(triangle.GetPlane(), properties, dt);
 }

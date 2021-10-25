@@ -39,8 +39,8 @@ void RopeScene::Update(float dt)
 		particle2.AddForce(-force);
 	}
 
-	// Update particles
-	for (int i = 0; i < numParticles; ++i)
+	// Update particles except the first one (which is fixed)
+	for (int i = 1; i < numParticles; ++i)
 	{
 		Particle& particle = m_Particles[i];
 
@@ -60,9 +60,7 @@ void RopeScene::SetupEntities()
 		CreateParticle();
 		Vector3 initialPosition = Vector3(static_cast<float>(i)/numParticles, 0.75f, 0.0f);
 		m_Particles[i].SetPosition(initialPosition);
-		m_Particles[i].SetFixed(false);
 	}
-	m_Particles[0].SetFixed(true);
 
 	// TODO: Might consider making a function like CreateCornellBox or whatever to the scene
 	m_Planes.reserve(6);

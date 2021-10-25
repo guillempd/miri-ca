@@ -45,7 +45,7 @@ protected:
 	// Resources
 	Ogre::MeshPtr m_PlaneMesh;
 	// Particles properties management
-	Particle::PhysicalProperties m_ParticlesPhysicalProperties;
+	Particle::Properties m_ParticlesPhysicalProperties;
 	// Ogre stuff
 	Ogre::SceneManager* m_SceneManager;
 	OgreBites::CameraMan* m_CameraMan;
