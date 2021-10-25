@@ -49,6 +49,5 @@ protected:
 	// Ogre stuff
 	Ogre::SceneManager* m_SceneManager;
 	OgreBites::CameraMan* m_CameraMan;
-	Particle::GenerationType m_GenerationType;
 };
 

@@ -9,7 +9,35 @@ BoxScene::BoxScene(std::vector<Ogre::MaterialPtr>& materials, Ogre::MeshPtr plan
 	, m_NumParticles(100)
 	, m_NumActiveParticles(0)
 	, m_ElapsedTime(0.0f)
+	, m_GenerationType(GenerationType::Random)
+	, m_UniformFloat(-1.0f, 1.0f)
 {
+}
+
+void BoxScene::ResetParticle(Particle& particle)
+{
+	// m_LifetimeLeft += lifetime; // So it takes into account the small part of lifetime it had left // TODO: Manage this
+	Vector3 initialPosition = Vector3::ZERO;
+	Vector3 initialVelocity = Vector3::ZERO;
+	switch (m_GenerationType)
+	{
+	case GenerationType::Random:
+	{
+		initialPosition = Vector3(m_UniformFloat(m_Rng), m_UniformFloat(m_Rng), m_UniformFloat(m_Rng));
+		initialVelocity = Vector3(m_UniformFloat(m_Rng), m_UniformFloat(m_Rng), m_UniformFloat(m_Rng));
+	} break;
+	case GenerationType::Cascade:
+	{
+		initialPosition = Vector3(0.0f, 0.9f, 0.0f);
+		initialVelocity = Vector3(m_UniformFloat(m_Rng), 0.0f, m_UniformFloat(m_Rng));
+	} break;
+	case GenerationType::Fountain:
+	{
+		initialPosition = Vector3(0.0f, -0.9f, 0.0f);
+		initialVelocity = Vector3(m_UniformFloat(m_Rng), 5.0f, m_UniformFloat(m_Rng));
+	} break;
+	}
+	particle.Set(initialPosition, initialVelocity);
 }
 
 void BoxScene::Update(float dt)
@@ -26,16 +54,16 @@ void BoxScene::Update(float dt)
 	{
 		Particle& particle = m_Particles[i];
 
-		float actualDt = particle.UpdateLifetime(dt);
-		if (actualDt <= 0.0f)
-		{
-			actualDt = -actualDt;
-			particle.Reset(m_GenerationType, m_ParticlesProperties.lifetime);
-		}
-		particle.Update(actualDt, m_ParticlesProperties);
-		CheckPlanes(particle, actualDt);
-		CheckSpheres(particle, actualDt);
-		CheckTriangles(particle, actualDt);
+		//float actualDt = particle.UpdateLifetime(dt);
+		//if (actualDt <= 0.0f)
+		//{
+		//	actualDt = -actualDt;
+		//	ResetParticle(particle); // TODO: Move this to this class
+		//}
+		particle.Update(dt, m_ParticlesProperties);
+		CheckPlanes(particle, dt);
+		CheckSpheres(particle, dt);
+		CheckTriangles(particle, dt);
 	}
 }
 
@@ -43,7 +71,10 @@ void BoxScene::SetupEntities()
 {
 	m_Particles.reserve(m_NumParticles);
 	for (int i = 0; i < m_NumParticles; ++i)
-		CreateParticle();
+	{
+		CreateParticle(); // TODO: This should ideally return a reference to the particle
+		ResetParticle(m_Particles[i]);
+	}
 
 	m_Planes.reserve(6);
 	CreatePlane(Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)); // FLOOR
@@ -65,9 +96,9 @@ void BoxScene::CreateInterface()
 {
 	if(ImGui::Begin("Generation Method"))
 	{
-		ImGui::RadioButton("Random", reinterpret_cast<int*>(&m_GenerationType), static_cast<int>(Particle::GenerationType::Random));
-		ImGui::RadioButton("Cascade", reinterpret_cast<int*>(&m_GenerationType), static_cast<int>(Particle::GenerationType::Cascade));
-		ImGui::RadioButton("Fountain", reinterpret_cast<int*>(&m_GenerationType), static_cast<int>(Particle::GenerationType::Fountain));
+		ImGui::RadioButton("Random", reinterpret_cast<int*>(&m_GenerationType), static_cast<int>(GenerationType::Random));
+		ImGui::RadioButton("Cascade", reinterpret_cast<int*>(&m_GenerationType), static_cast<int>(GenerationType::Cascade));
+		ImGui::RadioButton("Fountain", reinterpret_cast<int*>(&m_GenerationType), static_cast<int>(GenerationType::Fountain));
 	}
 	ImGui::End();
 }

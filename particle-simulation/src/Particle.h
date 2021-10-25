@@ -13,7 +13,6 @@ class Particle
 	using Vector3 = Ogre::Vector3;
 public:
 	enum class SolverMethod {Euler, EulerSemi, Verlet};
-	enum class GenerationType {Random, Cascade, Fountain}; // TODO: Move to BoxScene
 	struct Properties
 	{
 		Vector3 gravity;
@@ -25,7 +24,6 @@ public:
 	};
 public:
 	Particle(Ogre::SceneNode* sceneNode);
-	void Reset(GenerationType generationType, float lifetime);
 	float UpdateLifetime(float dt);
 	void CheckAndResolveCollision(const Plane &plane, const Properties& properties, float dt);
 	void CheckAndResolveCollision(const Sphere &sphere, const Properties& properties, float dt);
@@ -56,6 +54,4 @@ private:
 	Vector3 m_CorrectedPreviousPosition;
 	Vector3 m_CurrentForce;
 	float m_LifetimeLeft;
-	static std::minstd_rand s_Rng;
-	static std::uniform_real_distribution<float> s_UniformFloat;
 };

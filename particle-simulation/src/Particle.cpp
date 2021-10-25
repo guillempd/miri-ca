@@ -1,40 +1,12 @@
 #include "Particle.h"
 
 using Ogre::Vector3;
-std::minstd_rand Particle::s_Rng = std::minstd_rand();
-std::uniform_real_distribution<float> Particle::s_UniformFloat = std::uniform_real_distribution<float>(-1.0f, 1.0f);
 
 Particle::Particle(Ogre::SceneNode* sceneNode)
 	: m_SceneNode(sceneNode)
 {
 	m_LifetimeLeft = 0.0f;
 	m_SceneNode->setVisible(false);
-}
-
-void Particle::Reset(GenerationType generationType, float lifetime)
-{
-	m_SceneNode->setVisible(true);
-	m_LifetimeLeft += lifetime; // So it takes into account the small part of lifetime it had left
-	m_CurrentForce = Vector3(0.0f, 0.0f, 0.0f);
-	switch (generationType)
-	{
-	case GenerationType::Random:
-	{
-		m_CurrentPosition = Vector3(s_UniformFloat(s_Rng), s_UniformFloat(s_Rng), s_UniformFloat(s_Rng));
-		m_CurrentVelocity = Vector3(s_UniformFloat(s_Rng), s_UniformFloat(s_Rng), s_UniformFloat(s_Rng));
-	} break;
-	case GenerationType::Cascade:
-	{
-		m_CurrentPosition = Vector3(0.0f, 0.9f, 0.0f);
-		m_CurrentVelocity = Vector3(s_UniformFloat(s_Rng), 0.0f, s_UniformFloat(s_Rng));
-	} break;
-	case GenerationType::Fountain:
-	{
-		m_CurrentPosition = Vector3(0.0f, -0.9f, 0.0f);
-		m_CurrentVelocity = Vector3(s_UniformFloat(s_Rng), 5.0f, s_UniformFloat(s_Rng));
-	} break;
-	}
-	CorrectPreviousPosition(1.0f/60.0f); // NOTE: This is only "valid" for 60Hz and Vsync on
 }
 
 float Particle::UpdateLifetime(float dt)

@@ -19,7 +19,6 @@ Scene::Scene(std::vector<Ogre::MaterialPtr>& materials, Ogre::MeshPtr planeMesh)
 	, m_ParticlesProperties{Vector3(0.0f, -9.8f, 0.0f), 1.0f, 0.5f, 0.5f, 5.0f, Particle::SolverMethod::Euler}
 	, m_SceneManager(nullptr)
 	, m_CameraMan(nullptr)
-	, m_GenerationType(Particle::GenerationType::Random)
 {
 }
 
