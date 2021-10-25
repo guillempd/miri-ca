@@ -49,17 +49,17 @@ void RopeScene::SetupEntities()
 	for (int i = 0; i < numParticles; ++i)
 	{
 		CreateParticle();
-		Vector3 initialPosition = Vector3(i / static_cast<float>(numParticles) * 2.0f - 1.0f, 0.75f, 0.0f);
+		Vector3 initialPosition = Vector3(static_cast<float>(i)/numParticles, 0.75f, 0.0f);
 		m_Particles[i].SetPosition(initialPosition);
 	}
 
 	m_Planes.reserve(6);
-	CreatePlane(Vector3(0.0f, -1.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f));
-	CreatePlane(Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f));
-	CreatePlane(Vector3(-1.0f, 0.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f));
-	CreatePlane(Vector3(1.0f, 0.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f));
-	CreatePlane(Vector3(0.0f, 0.0f, 1.0f), Vector3(0.0f, 0.0f, 1.0f));
-	CreatePlane(Vector3(0.0f, 0.0f, -1.0f), Vector3(0.0f, 0.0f, -1.0f));
+	CreatePlane(Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)); // FLOOR
+	CreatePlane(Vector3(0.0f, -1.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f)); // CEILING
+	CreatePlane(Vector3(1.0f, 0.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f)); // LEFT
+	CreatePlane(Vector3(-1.0f, 0.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f)); // RIGHT
+	CreatePlane(Vector3(0.0f, 0.0f, 1.0f), Vector3(0.0f, 0.0f, -1.0f)); // BACK
+	CreatePlane(Vector3(0.0f, 0.0f, -1.0f), Vector3(0.0f, 0.0f, 1.0f)); // FRONT
 
 	m_Spheres.reserve(1);
 	CreateSphere(Vector3(0.0f, -0.5f, 0.0f), 0.25f);
@@ -103,7 +103,7 @@ void RopeScene::CreateInterface()
 	if (ImGui::Begin("Spring Settings"))
 	{
 		ImGui::DragFloat("Elasticity", &m_ElasticityK, 1.0f, 0.0f, std::numeric_limits<float>::max(),"%.3f", flags);
-		ImGui::DragFloat("RestLength", &m_RestLength, 0.05f, 0.0f, 0.25f, "%.3f", flags);
+		ImGui::DragFloat("RestLength", &m_RestLength, 0.01f, 0.0f, 0.25f, "%.3f", flags);
 	}
 	ImGui::End();
 }

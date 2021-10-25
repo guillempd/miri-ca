@@ -77,7 +77,7 @@ bool ParticleSimulationApp::frameEnded(const Ogre::FrameEvent& event)
 
 void ParticleSimulationApp::CreateResources()
 {
-    m_PlaneMesh = Ogre::MeshManager::getSingleton().createPlane("Plane", "General", Ogre::Plane(Vector3(0.0f, 0.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f)), 2, 2);
+    m_PlaneMesh = Ogre::MeshManager::getSingleton().createPlane("Plane", "General", Ogre::Plane(Vector3(0.0f, 0.0f, -1.0f), Vector3(0.0f, 0.0f, 0.0f)), 2, 2);
 
     m_Materials.reserve(10);
 
