@@ -24,7 +24,10 @@ void RopeScene::Update(float dt)
 		Vector3 direction = particle2.GetPosition() - particle1.GetPosition();
 		float length = direction.length();
 		direction.normalise();
-		Vector3 force = m_ElasticityK * (length - m_RestLength)*direction;
+
+		float elasticTerm = m_ElasticityK * (length - m_RestLength);
+		float dampingTerm = m_DampingK * (particle2.GetVelocity() - particle1.GetVelocity()).dotProduct(direction);
+		Vector3 force = (elasticTerm + dampingTerm) * direction;
 
 		particle1.AddForce(force);
 		particle2.AddForce(-force);
@@ -51,7 +54,9 @@ void RopeScene::SetupEntities()
 		CreateParticle();
 		Vector3 initialPosition = Vector3(static_cast<float>(i)/numParticles, 0.75f, 0.0f);
 		m_Particles[i].SetPosition(initialPosition);
+		m_Particles[i].SetFixed(false);
 	}
+	m_Particles[0].SetFixed(true);
 
 	m_Planes.reserve(6);
 	CreatePlane(Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)); // FLOOR
@@ -102,7 +107,8 @@ void RopeScene::CreateInterface()
 
 	if (ImGui::Begin("Spring Settings"))
 	{
-		ImGui::DragFloat("Elasticity", &m_ElasticityK, 1.0f, 0.0f, std::numeric_limits<float>::max(),"%.3f", flags);
+		ImGui::DragFloat("Elasticity Constant", &m_ElasticityK, 1.0f, 0.0f, std::numeric_limits<float>::max(),"%.3f", flags);
+		ImGui::DragFloat("Damping Constant", &m_DampingK, 1.0f, 0.0f, std::numeric_limits<float>::max(), "%.3f", flags);
 		ImGui::DragFloat("RestLength", &m_RestLength, 0.01f, 0.0f, 0.25f, "%.3f", flags);
 	}
 	ImGui::End();

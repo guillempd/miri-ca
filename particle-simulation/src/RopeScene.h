@@ -16,5 +16,6 @@ private:
 	void CreateInterface();
 private:
 	float m_ElasticityK;
+	float m_DampingK;
 	float m_RestLength;
 };

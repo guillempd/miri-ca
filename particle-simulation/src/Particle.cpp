@@ -9,6 +9,7 @@ Particle::Particle(Ogre::SceneNode* sceneNode)
 {
 	m_LifetimeLeft = 0.0f;
 	m_SceneNode->setVisible(false);
+	m_Fixed = false;
 }
 
 void Particle::Reset(GenerationType generationType, float lifetime)
@@ -46,6 +47,9 @@ float Particle::UpdateLifetime(float dt)
 
 void Particle::UpdatePosition(float dt, SolverMethod method, const PhysicalProperties& properties)
 {
+	if (m_Fixed) return;
+
+	// !m_Fixed
 	m_PreviousPosition = m_CorrectedPreviousPosition;
 	Vector3 currentAcceleration = CurrentForce(properties) / properties.mass;
 	switch (method)
@@ -81,6 +85,9 @@ void Particle::SavePreviousPosition()
 
 void Particle::CheckAndResolveCollision(const Plane& plane, const PhysicalProperties& properties, float dt)
 {
+	if (m_Fixed) return;
+
+	// !m_Fixed
 	if (CheckCollision(plane))
 	{
 		ResolveCollision(plane, properties, dt);
@@ -90,6 +97,9 @@ void Particle::CheckAndResolveCollision(const Plane& plane, const PhysicalProper
 
 void Particle::CheckAndResolveCollision(const Sphere& sphere, const PhysicalProperties& properties, float dt)
 {
+	if (m_Fixed) return;
+
+	// !m_Fixed
 	if (CheckCollision(sphere))
 	{
 		ResolveCollision(sphere, properties, dt);
@@ -99,6 +109,9 @@ void Particle::CheckAndResolveCollision(const Sphere& sphere, const PhysicalProp
 
 void Particle::CheckAndResolveCollision(const Triangle& triangle, const PhysicalProperties& properties, float dt)
 {
+	if (m_Fixed) return;
+
+	// !m_Fixed
 	if (CheckCollision(triangle))
 	{
 		ResolveCollision(triangle, properties, dt);
