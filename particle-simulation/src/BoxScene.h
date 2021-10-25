@@ -26,4 +26,6 @@ private:
 	float m_ElapsedTime;
 	GenerationType m_GenerationType;
 	std::uniform_real_distribution<float> m_UniformFloat;
+	std::vector<float> m_ParticlesLifetimes;
+	const float s_ParticlesLifetime = 10.0f; // TODO: Better do this
 };

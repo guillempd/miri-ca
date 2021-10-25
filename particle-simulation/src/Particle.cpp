@@ -5,15 +5,68 @@ using Ogre::Vector3;
 Particle::Particle(Ogre::SceneNode* sceneNode)
 	: m_SceneNode(sceneNode)
 {
-	m_LifetimeLeft = 0.0f;
 	m_SceneNode->setVisible(false);
 }
 
-float Particle::UpdateLifetime(float dt)
+void Particle::Set(const Vector3& position, const Vector3& velocity)
 {
-	m_LifetimeLeft -= dt;
-	if (m_LifetimeLeft <= 0.0f) dt = m_LifetimeLeft;
-	return dt;
+	m_CurrentPosition = position;
+	m_CurrentVelocity = velocity;
+	m_CurrentForce = Vector3::ZERO;
+	m_SceneNode->setVisible(true); // TODO: Move this to some other place
+	CorrectPreviousPosition(1.0f / 144.0f);
+	UpdateSceneNode();
+}
+
+void Particle::CorrectPreviousPosition(float dt)
+{
+	m_CorrectedPreviousPosition = m_CurrentPosition - m_CurrentVelocity * dt;
+}
+
+void Particle::UpdateSceneNode()
+{
+	m_SceneNode->setPosition(m_CurrentPosition);
+}
+
+void Particle::AddForce(const Vector3& force)
+{
+	m_CurrentForce += force;
+}
+
+void Particle::Update(const Properties& properties, float dt)
+{
+	m_PreviousPosition = m_CorrectedPreviousPosition;
+	Vector3 currentAcceleration = CurrentForce(properties) / properties.mass;
+	switch (properties.method)
+	{
+	case SolverMethod::Euler:
+	{
+		SavePreviousPosition();
+		m_CurrentPosition += m_CurrentVelocity * dt;
+		m_CurrentVelocity += currentAcceleration * dt;
+	} break;
+	case SolverMethod::EulerSemi:
+	{
+		SavePreviousPosition();
+		m_CurrentVelocity += currentAcceleration * dt;
+		m_CurrentPosition += m_CurrentVelocity * dt;
+	} break;
+	case SolverMethod::Verlet:
+	{
+		Vector3 positionDelta = m_CurrentPosition - m_PreviousPosition;
+		SavePreviousPosition();
+		m_CurrentPosition += positionDelta + currentAcceleration * dt * dt;
+		m_CurrentVelocity = (m_CurrentPosition - m_PreviousPosition) / dt;
+	} break;
+	}
+	UpdateSceneNode();
+}
+
+Vector3 Particle::CurrentForce(const Properties& properties)
+{
+	Vector3 currentForce = m_CurrentForce;
+	m_CurrentForce = Vector3::ZERO; // NOTE: All the forces accumulated are removed when force is consumed
+	return currentForce + properties.mass * properties.gravity;
 }
 
 void Particle::SavePreviousPosition()
@@ -47,57 +100,6 @@ void Particle::CheckAndResolveCollision(const Triangle& triangle, const Properti
 		ResolveCollision(triangle, properties, dt);
 		UpdateSceneNode();
 	}
-}
-
-void Particle::Set(const Vector3& position, const Vector3& velocity)
-{
-	m_CurrentPosition = position;
-	m_CurrentVelocity = velocity;
-	m_CurrentForce = Vector3::ZERO;
-	m_SceneNode->setVisible(true); // TODO: Move this to some other place
-	CorrectPreviousPosition(1.0f / 144.0f);
-	UpdateSceneNode();
-}
-
-void Particle::AddForce(const Vector3& force)
-{
-	m_CurrentForce += force;
-}
-
-void Particle::Update(float dt, const Properties& properties)
-{
-	m_PreviousPosition = m_CorrectedPreviousPosition;
-	Vector3 currentAcceleration = CurrentForce(properties) / properties.mass;
-	switch (properties.method)
-	{
-	case SolverMethod::Euler:
-	{
-		SavePreviousPosition();
-		m_CurrentPosition += m_CurrentVelocity * dt;
-		m_CurrentVelocity += currentAcceleration * dt;
-	} break;
-	case SolverMethod::EulerSemi:
-	{
-		SavePreviousPosition();
-		m_CurrentVelocity += currentAcceleration * dt;
-		m_CurrentPosition += m_CurrentVelocity * dt;
-	} break;
-	case SolverMethod::Verlet:
-	{
-		Vector3 positionDelta = m_CurrentPosition - m_PreviousPosition;
-		SavePreviousPosition();
-		m_CurrentPosition += positionDelta + currentAcceleration * dt * dt;
-		m_CurrentVelocity = (m_CurrentPosition - m_PreviousPosition) / dt;
-	} break;
-	}
-	UpdateSceneNode();
-}
-
-Vector3 Particle::CurrentForce(const Properties &properties)
-{
-	Vector3 currentForce = m_CurrentForce;
-	m_CurrentForce = Vector3(0.0f, 0.0f, 0.0f); // TODO: Be careful about this, current force is reseted after using this
-	return currentForce + properties.mass * properties.gravity;
 }
 
 bool Particle::CheckCollision(const Plane& plane) const
@@ -145,14 +147,4 @@ void Particle::ResolveCollision(const Sphere& sphere, const Properties& properti
 void Particle::ResolveCollision(const Triangle& triangle, const Properties& properties, float dt)
 {
 	ResolveCollision(triangle.GetPlane(), properties, dt);
-}
-
-void Particle::UpdateSceneNode()
-{
-	m_SceneNode->setPosition(m_CurrentPosition);
-}
-
-void Particle::CorrectPreviousPosition(float dt)
-{
-	m_CorrectedPreviousPosition = m_CurrentPosition - m_CurrentVelocity * dt;
 }

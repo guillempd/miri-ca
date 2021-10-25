@@ -11,12 +11,12 @@ BoxScene::BoxScene(std::vector<Ogre::MaterialPtr>& materials, Ogre::MeshPtr plan
 	, m_ElapsedTime(0.0f)
 	, m_GenerationType(GenerationType::Random)
 	, m_UniformFloat(-1.0f, 1.0f)
+	, m_ParticlesLifetimes(m_NumParticles, 0.0f)
 {
 }
 
 void BoxScene::ResetParticle(Particle& particle)
 {
-	// m_LifetimeLeft += lifetime; // So it takes into account the small part of lifetime it had left // TODO: Manage this
 	Vector3 initialPosition = Vector3::ZERO;
 	Vector3 initialVelocity = Vector3::ZERO;
 	switch (m_GenerationType)
@@ -47,20 +47,24 @@ void BoxScene::Update(float dt)
 	CreateInterface();
 
 	m_ElapsedTime += dt;
-	m_NumActiveParticles = static_cast<int>(m_NumParticles * (m_ElapsedTime / m_ParticlesProperties.lifetime));
+	m_NumActiveParticles = static_cast<int>(m_NumParticles * (m_ElapsedTime / s_ParticlesLifetime));
 	m_NumActiveParticles = (m_NumActiveParticles <= m_NumParticles ? m_NumActiveParticles : m_NumParticles);
 
 	for (int i = 0; i < m_NumActiveParticles; ++i)
 	{
 		Particle& particle = m_Particles[i];
+		float& particleLifetime = m_ParticlesLifetimes[i];
 
-		//float actualDt = particle.UpdateLifetime(dt);
-		//if (actualDt <= 0.0f)
-		//{
-		//	actualDt = -actualDt;
-		//	ResetParticle(particle); // TODO: Move this to this class
-		//}
-		particle.Update(dt, m_ParticlesProperties);
+		particleLifetime -= dt;
+		if (particleLifetime <= 0.0f)
+		{
+			ResetParticle(particle);
+			dt = -particleLifetime;
+			particleLifetime += s_ParticlesLifetime;
+		}
+
+		particle.Update(m_ParticlesProperties, dt);
+
 		CheckPlanes(particle, dt);
 		CheckSpheres(particle, dt);
 		CheckTriangles(particle, dt);
@@ -71,10 +75,7 @@ void BoxScene::SetupEntities()
 {
 	m_Particles.reserve(m_NumParticles);
 	for (int i = 0; i < m_NumParticles; ++i)
-	{
-		CreateParticle(); // TODO: This should ideally return a reference to the particle
-		ResetParticle(m_Particles[i]);
-	}
+		CreateParticle();
 
 	m_Planes.reserve(6);
 	CreatePlane(Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)); // FLOOR

@@ -16,7 +16,7 @@ Scene::Scene(std::vector<Ogre::MaterialPtr>& materials, Ogre::MeshPtr planeMesh)
 	, m_Rng()
 	, m_UniformMaterialIndex(0, m_Materials.size()-1)
 	, m_PlaneMesh(planeMesh)
-	, m_ParticlesProperties{Vector3(0.0f, -9.8f, 0.0f), 1.0f, 0.5f, 0.5f, 5.0f, Particle::SolverMethod::Euler}
+	, m_ParticlesProperties{Vector3(0.0f, -9.8f, 0.0f), 1.0f, 0.5f, 0.5f, Particle::SolverMethod::Euler}
 	, m_SceneManager(nullptr)
 	, m_CameraMan(nullptr)
 {
@@ -74,7 +74,7 @@ void Scene::SetupCamera(Ogre::RenderWindow* renderWindow)
 	m_CameraMan->setTopSpeed(10.0f); // TODO: Set appropriately
 }
 
-void Scene::CreateParticle()
+Particle& Scene::CreateParticle()
 {
 	Ogre::Entity* particleEntity = m_SceneManager->createEntity("sphere.mesh");
 	particleEntity->setMaterial(m_Materials[m_UniformMaterialIndex(m_Rng)]);
@@ -84,26 +84,29 @@ void Scene::CreateParticle()
 	particleEntityNode->setScale(0.0002f, 0.0002f, 0.0002f); // Set particles radius to be 1/100th of cube's side
 
 	m_Particles.emplace_back(particleEntityNode);
+	return m_Particles.back();
 }
 
-void Scene::CreatePlane(const Vector3 &normal, const Vector3& pointInPlane)
+Plane& Scene::CreatePlane(const Vector3 &normal, const Vector3& pointInPlane)
 {
 	Ogre::Entity* planeEntity = m_SceneManager->createEntity(m_PlaneMesh);
 	Ogre::SceneNode* planeEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
 	planeEntityNode->attachObject(planeEntity);
 	m_Planes.emplace_back(planeEntityNode, normal, pointInPlane);
+	return m_Planes.back();
 }
 
-void Scene::CreateSphere(const Vector3& center, float radius)
+Sphere& Scene::CreateSphere(const Vector3& center, float radius)
 {
 	Ogre::Entity* sphereEntity = m_SceneManager->createEntity("sphere.mesh");
 	Ogre::SceneNode* sphereEntityNode = m_SceneManager->getRootSceneNode()->createChildSceneNode();
 	sphereEntityNode->attachObject(sphereEntity);
 	sphereEntityNode->setScale(0.01f, 0.01f, 0.01f);
 	m_Spheres.emplace_back(sphereEntityNode, center, radius);
+	return m_Spheres.back();
 }
 
-void Scene::CreateTriangle(const Vector3& p0, const Vector3& p1, const Vector3& p2)
+Triangle& Scene::CreateTriangle(const Vector3& p0, const Vector3& p1, const Vector3& p2)
 {
 	Ogre::ManualObject* manualObject = m_SceneManager->createManualObject();
 	manualObject->begin(Ogre::MaterialManager::getSingleton().getDefaultMaterial());
@@ -127,10 +130,11 @@ void Scene::CreateTriangle(const Vector3& p0, const Vector3& p1, const Vector3& 
 	m_SceneManager->getRootSceneNode()->createChildSceneNode()->attachObject(manualObject);
 
 	m_Triangles.emplace_back(p0, p1, p2);
+	return m_Triangles.back();
 }
 
 // TODO: Destroy SceneNode's (?)
-// TODO: Do this in shutdown
+// TODO: Do this in shutdown (?)
 Scene::~Scene()
 {
 	m_Camera->detachFromParent();
@@ -184,7 +188,6 @@ void Scene::Update(float dt)
 		ImGui::DragFloat("Mass", &m_ParticlesProperties.mass, 0.05f, std::numeric_limits<float>::min(), std::numeric_limits<float>::max(), "%.3f", flags);
 		ImGui::SliderFloat("Bouncing Coefficient", &m_ParticlesProperties.bouncingCoefficient, 0.0f, 1.0f, "%.3f", flags);
 		ImGui::SliderFloat("Friction Coefficient", &m_ParticlesProperties.frictionCoefficient, 0.0f, 1.0f, "%.3f", flags);
-		ImGui::DragFloat("Lifetime", &m_ParticlesProperties.lifetime, 0.05f, 1.0f, std::numeric_limits<float>::max(), "%.3f", flags); // TODO: Remove from here when refactoring particle
 		ImGui::DragFloat3("Gravity", m_ParticlesProperties.gravity.ptr(), 0.05f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max(), "%.3f", flags);
 	}
 	ImGui::End();

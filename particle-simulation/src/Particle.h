@@ -6,8 +6,6 @@
 
 #include <Ogre.h>
 
-#include <random>
-
 class Particle
 {
 	using Vector3 = Ogre::Vector3;
@@ -19,22 +17,18 @@ public:
 		float mass;
 		float bouncingCoefficient;
 		float frictionCoefficient;
-		float lifetime; // TODO: Move to BoxScene
 		SolverMethod method;
 	};
 public:
 	Particle(Ogre::SceneNode* sceneNode);
-	float UpdateLifetime(float dt);
+	void Set(const Vector3& position, const Vector3& velocity);
+	void AddForce(const Vector3& force);
+	void Update(const Properties& properties, float dt);
 	void CheckAndResolveCollision(const Plane &plane, const Properties& properties, float dt);
 	void CheckAndResolveCollision(const Sphere &sphere, const Properties& properties, float dt);
 	void CheckAndResolveCollision(const Triangle& triangle, const Properties& properties, float dt);
-	// NEW API
-	void Set(const Vector3& position, const Vector3& velocity);
-	void AddForce(const Vector3& force);
 	Vector3 GetPosition() const { return m_CurrentPosition; }
 	Vector3 GetVelocity() const { return m_CurrentVelocity; }
-	void Update(float dt, const Properties& properties);
-	//void
 private:
 	Vector3 CurrentForce(const Properties& properties);
 	bool CheckCollision(const Plane& plane) const;
@@ -43,9 +37,9 @@ private:
 	void ResolveCollision(const Plane& plane, const Properties& properties, float dt);
 	void ResolveCollision(const Sphere& sphere, const Properties& properties, float dt);
 	void ResolveCollision(const Triangle& triangle, const Properties& properties, float dt);
-	void UpdateSceneNode();
 	void CorrectPreviousPosition(float dt);
 	void SavePreviousPosition();
+	void UpdateSceneNode();
 private:
 	Ogre::SceneNode* m_SceneNode;
 	Vector3 m_CurrentPosition;
@@ -53,5 +47,4 @@ private:
 	Vector3 m_CurrentVelocity;
 	Vector3 m_CorrectedPreviousPosition;
 	Vector3 m_CurrentForce;
-	float m_LifetimeLeft;
 };
