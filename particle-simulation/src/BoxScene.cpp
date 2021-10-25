@@ -6,11 +6,16 @@ using Ogre::Vector3;
 
 BoxScene::BoxScene(std::vector<Ogre::MaterialPtr>& materials, Ogre::MeshPtr planeMesh)
 	: Scene(materials, planeMesh)
+	, m_NumParticles(100)
+	, m_NumActiveParticles(0)
+	, m_ElapsedTime(0.0f)
 {
 }
 
 void BoxScene::Update(float dt)
 {
+	Scene::Update(dt);
+
 	CreateInterface();
 
 	m_ElapsedTime += dt;
@@ -58,35 +63,11 @@ void BoxScene::SetupEntities()
 
 void BoxScene::CreateInterface()
 {
-	ImGui::ShowMetricsWindow(); // For fps counter
-
-	if (ImGui::Begin("Settings"))
+	if(ImGui::Begin("Generation Method"))
 	{
-		ImGui::Text("Solver Method");
-		ImGui::RadioButton("Euler Original", reinterpret_cast<int*>(&m_SolverMethod), static_cast<int>(Particle::SolverMethod::Euler));
-		ImGui::RadioButton("Euler Semi Implicit", reinterpret_cast<int*>(&m_SolverMethod), static_cast<int>(Particle::SolverMethod::EulerSemi));
-		ImGui::RadioButton("Verlet", reinterpret_cast<int*>(&m_SolverMethod), static_cast<int>(Particle::SolverMethod::Verlet));
-
-		ImGui::Separator();
-
-		ImGuiSliderFlags flags = ImGuiSliderFlags_AlwaysClamp;
-
-		ImGui::Text("Particle Properties");
-		ImGui::DragFloat("Mass", &m_ParticlesPhysicalProperties.mass, 0.05f, std::numeric_limits<float>::min(), std::numeric_limits<float>::max(), "%.3f", flags);
-		ImGui::SliderFloat("Bouncing Coefficient", &m_ParticlesPhysicalProperties.bouncingCoefficient, 0.0f, 1.0f, "%.3f", flags);
-		ImGui::SliderFloat("Friction Coefficient", &m_ParticlesPhysicalProperties.frictionCoefficient, 0.0f, 1.0f, "%.3f", flags);
-		ImGui::DragFloat("Lifetime", &m_ParticlesPhysicalProperties.lifetime, 0.05f, 1.0f, std::numeric_limits<float>::max(), "%.3f", flags);
-		ImGui::DragFloat3("Gravity", m_ParticlesPhysicalProperties.gravity.ptr(), 0.05f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max(), "%.3f", flags);
-
-		ImGui::Separator();
-
-		ImGui::Text("Generation Method");
 		ImGui::RadioButton("Random", reinterpret_cast<int*>(&m_GenerationType), static_cast<int>(Particle::GenerationType::Random));
 		ImGui::RadioButton("Cascade", reinterpret_cast<int*>(&m_GenerationType), static_cast<int>(Particle::GenerationType::Cascade));
 		ImGui::RadioButton("Fountain", reinterpret_cast<int*>(&m_GenerationType), static_cast<int>(Particle::GenerationType::Fountain));
-
-		//ImGui::Separator();
-		// TODO: Add controls for number of particles, probably should reset the scene after changing this
 	}
 	ImGui::End();
 }

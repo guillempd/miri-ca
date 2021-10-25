@@ -16,4 +16,8 @@ public:
 private:
 	void SetupEntities() override;
 	void CreateInterface();
+private:
+	int m_NumParticles;
+	int m_NumActiveParticles;
+	float m_ElapsedTime;
 };

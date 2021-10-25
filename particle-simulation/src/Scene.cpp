@@ -17,9 +17,6 @@ Scene::Scene(std::vector<Ogre::MaterialPtr>& materials, Ogre::MeshPtr planeMesh)
 	, m_UniformMaterialIndex(0, m_Materials.size()-1)
 	, m_PlaneMesh(planeMesh)
 	, m_ParticlesPhysicalProperties{Vector3(0.0f, -9.8f, 0.0f), 1.0f, 0.5f, 0.5f, 5.0f}
-	, m_NumParticles(100)
-	, m_NumActiveParticles(0)
-	, m_ElapsedTime(0.0f)
 	, m_SceneManager(nullptr)
 	, m_CameraMan(nullptr)
 	, m_SolverMethod(Particle::SolverMethod::Euler)
@@ -167,4 +164,30 @@ void Scene::CheckTriangles(Particle& particle, float dt)
 	{
 		particle.CheckAndResolveCollision(triangle, m_ParticlesPhysicalProperties, dt);
 	}
+}
+
+// TODO: Maybe move this to another method not named update
+void Scene::Update(float dt)
+{
+	ImGuiSliderFlags flags = ImGuiSliderFlags_AlwaysClamp;
+
+	ImGui::ShowMetricsWindow(); // For fps counter
+
+	if (ImGui::Begin("Particles Settings"))
+	{
+		ImGui::Text("Solver Method");
+		ImGui::RadioButton("Euler Original", reinterpret_cast<int*>(&m_SolverMethod), static_cast<int>(Particle::SolverMethod::Euler));
+		ImGui::RadioButton("Euler Semi Implicit", reinterpret_cast<int*>(&m_SolverMethod), static_cast<int>(Particle::SolverMethod::EulerSemi));
+		ImGui::RadioButton("Verlet", reinterpret_cast<int*>(&m_SolverMethod), static_cast<int>(Particle::SolverMethod::Verlet));
+
+		ImGui::Separator();
+
+		ImGui::Text("Physical Properties");
+		ImGui::DragFloat("Mass", &m_ParticlesPhysicalProperties.mass, 0.05f, std::numeric_limits<float>::min(), std::numeric_limits<float>::max(), "%.3f", flags);
+		ImGui::SliderFloat("Bouncing Coefficient", &m_ParticlesPhysicalProperties.bouncingCoefficient, 0.0f, 1.0f, "%.3f", flags);
+		ImGui::SliderFloat("Friction Coefficient", &m_ParticlesPhysicalProperties.frictionCoefficient, 0.0f, 1.0f, "%.3f", flags);
+		ImGui::DragFloat("Lifetime", &m_ParticlesPhysicalProperties.lifetime, 0.05f, 1.0f, std::numeric_limits<float>::max(), "%.3f", flags); // TODO: Remove from here when refactoring particle
+		ImGui::DragFloat3("Gravity", m_ParticlesPhysicalProperties.gravity.ptr(), 0.05f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max(), "%.3f", flags);
+	}
+	ImGui::End();
 }

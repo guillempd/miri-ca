@@ -18,7 +18,7 @@ public:
 	Scene(std::vector<Ogre::MaterialPtr>& materials, Ogre::MeshPtr planeMesh);
 	virtual ~Scene(); // = default (?)
 	void Setup(Ogre::SceneManager* sceneManager, Ogre::RenderWindow* renderWindow);
-	virtual void Update(float dt) = 0;
+	virtual void Update(float dt);
 	OgreBites::CameraMan* GetCameraMan() { return m_CameraMan; }
 protected:
 	void SetupCamera(Ogre::RenderWindow* renderWindow);
@@ -46,9 +46,7 @@ protected:
 	Ogre::MeshPtr m_PlaneMesh;
 	// Particles properties management
 	Particle::PhysicalProperties m_ParticlesPhysicalProperties;
-	int m_NumParticles;
-	int m_NumActiveParticles;
-	float m_ElapsedTime;
+	// Ogre stuff
 	Ogre::SceneManager* m_SceneManager;
 	OgreBites::CameraMan* m_CameraMan;
 	Particle::SolverMethod m_SolverMethod;
