@@ -53,6 +53,7 @@ void Particle::Update(const Properties& properties, float dt)
 	} break;
 	case SolverMethod::Verlet:
 	{
+		if (dt == 0) dt = 1.0f / 144.0f; // NOTE: Dirty fix for the first frame
 		Vector3 positionDelta = m_CurrentPosition - m_PreviousPosition;
 		SavePreviousPosition();
 		m_CurrentPosition += positionDelta + currentAcceleration * dt * dt;

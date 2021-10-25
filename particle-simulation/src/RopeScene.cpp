@@ -6,23 +6,21 @@ using Ogre::Vector3;
 
 RopeScene::RopeScene(std::vector<Ogre::MaterialPtr>& materials, Ogre::MeshPtr planeMesh)
 	: Scene(materials, planeMesh)
-	, m_ElasticityK(1.0f)
-	, m_DampingK(1.0f)
-	, m_RestLength(0.1f)
+	, m_ElasticityK(100.0f)
+	, m_DampingK(0.25f)
+	, m_NumParticles(50)
+	, m_RestLength(0.5f/m_NumParticles)
 {
 }
 
-// TODO: Handle initialization of the particles tha form the rope
 void RopeScene::Update(float dt)
 {
 	Scene::Update(dt);
 
 	CreateInterface();
 
-	int numParticles = m_Particles.size();
-
 	// Compute forces
-	for (int i = 1; i < numParticles; ++i)
+	for (int i = 1; i < m_NumParticles; ++i)
 	{
 		Particle& particle1 = m_Particles[i-1];
 		Particle& particle2 = m_Particles[i];
@@ -40,7 +38,7 @@ void RopeScene::Update(float dt)
 	}
 
 	// Update particles except the first one (which is fixed)
-	for (int i = 1; i < numParticles; ++i)
+	for (int i = 1; i < m_NumParticles; ++i)
 	{
 		Particle& particle = m_Particles[i];
 
@@ -53,11 +51,10 @@ void RopeScene::Update(float dt)
 
 void RopeScene::SetupEntities()
 {
-	constexpr int numParticles = 10;
-	m_Particles.reserve(numParticles);
-	for (int i = 0; i < numParticles; ++i)
+	m_Particles.reserve(m_NumParticles);
+	for (int i = 0; i < m_NumParticles; ++i)
 	{
-		Vector3 initialPosition = Vector3(static_cast<float>(i)/numParticles, 0.75f, 0.0f);
+		Vector3 initialPosition = Vector3(static_cast<float>(i)/m_NumParticles, 0.75f, 0.0f);
 		Particle& particle = CreateParticle();
 		particle.Set(initialPosition, Vector3::ZERO);
 	}
@@ -72,7 +69,7 @@ void RopeScene::SetupEntities()
 	CreatePlane(Vector3(0.0f, 0.0f, -1.0f), Vector3(0.0f, 0.0f, 1.0f)); // FRONT
 
 	m_Spheres.reserve(1);
-	CreateSphere(Vector3(0.0f, -0.5f, 0.0f), 0.25f);
+	CreateSphere(Vector3(0.0f, 0.0f, 0.0f), 0.5f);
 }
 
 void RopeScene::CreateInterface()
@@ -81,9 +78,9 @@ void RopeScene::CreateInterface()
 
 	if (ImGui::Begin("Spring Settings"))
 	{
-		ImGui::DragFloat("Elasticity Constant", &m_ElasticityK, 1.0f, 0.0f, std::numeric_limits<float>::max(),"%.3f", flags);
-		ImGui::DragFloat("Damping Constant", &m_DampingK, 1.0f, 0.0f, std::numeric_limits<float>::max(), "%.3f", flags);
-		ImGui::DragFloat("RestLength", &m_RestLength, 0.01f, 0.0f, 0.25f, "%.3f", flags);
+		ImGui::DragFloat("Elasticity Constant", &m_ElasticityK, 0.01f, 0.0f, std::numeric_limits<float>::max(),"%.3f", flags);
+		ImGui::DragFloat("Damping Constant", &m_DampingK, 0.01f, 0.0f, std::numeric_limits<float>::max(), "%.3f", flags);
+		ImGui::DragFloat("RestLength", &m_RestLength, 0.001f, 0.0f, 0.1f, "%.3f", flags);
 	}
 	ImGui::End();
 }

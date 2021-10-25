@@ -16,7 +16,7 @@ Scene::Scene(std::vector<Ogre::MaterialPtr>& materials, Ogre::MeshPtr planeMesh)
 	, m_Rng()
 	, m_UniformMaterialIndex(0, m_Materials.size()-1)
 	, m_PlaneMesh(planeMesh)
-	, m_ParticlesProperties{Vector3(0.0f, -9.8f, 0.0f), 1.0f, 0.5f, 0.5f, Particle::SolverMethod::Euler}
+	, m_ParticlesProperties{Vector3(0.0f, -9.8f, 0.0f), 0.01f, 0.5f, 0.5f, Particle::SolverMethod::Verlet}
 	, m_SceneManager(nullptr)
 	, m_CameraMan(nullptr)
 {
@@ -185,7 +185,7 @@ void Scene::Update(float dt)
 		ImGui::Separator();
 
 		ImGui::Text("Physical Properties");
-		ImGui::DragFloat("Mass", &m_ParticlesProperties.mass, 0.05f, std::numeric_limits<float>::min(), std::numeric_limits<float>::max(), "%.3f", flags);
+		ImGui::DragFloat("Mass", &m_ParticlesProperties.mass, 0.01f, 0.01f, std::numeric_limits<float>::max(), "%.3f", flags);
 		ImGui::SliderFloat("Bouncing Coefficient", &m_ParticlesProperties.bouncingCoefficient, 0.0f, 1.0f, "%.3f", flags);
 		ImGui::SliderFloat("Friction Coefficient", &m_ParticlesProperties.frictionCoefficient, 0.0f, 1.0f, "%.3f", flags);
 		ImGui::DragFloat3("Gravity", m_ParticlesProperties.gravity.ptr(), 0.05f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max(), "%.3f", flags);

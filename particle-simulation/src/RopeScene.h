@@ -17,5 +17,6 @@ private:
 private:
 	float m_ElasticityK;
 	float m_DampingK;
+	int m_NumParticles;
 	float m_RestLength;
 };
