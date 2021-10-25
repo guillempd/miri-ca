@@ -44,7 +44,7 @@ void RopeScene::Update(float dt)
 	{
 		Particle& particle = m_Particles[i];
 
-		particle.UpdatePosition(dt, m_SolverMethod, m_ParticlesPhysicalProperties);
+		particle.Update(dt, m_ParticlesProperties);
 		CheckPlanes(particle, dt);
 		CheckSpheres(particle, dt);
 		CheckTriangles(particle, dt);
@@ -59,7 +59,7 @@ void RopeScene::SetupEntities()
 	{
 		CreateParticle();
 		Vector3 initialPosition = Vector3(static_cast<float>(i)/numParticles, 0.75f, 0.0f);
-		m_Particles[i].SetPosition(initialPosition);
+		m_Particles[i].Set(initialPosition, Vector3::ZERO);
 	}
 
 	// TODO: Might consider making a function like CreateCornellBox or whatever to the scene

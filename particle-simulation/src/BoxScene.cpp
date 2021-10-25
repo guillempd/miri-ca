@@ -19,7 +19,7 @@ void BoxScene::Update(float dt)
 	CreateInterface();
 
 	m_ElapsedTime += dt;
-	m_NumActiveParticles = static_cast<int>(m_NumParticles * (m_ElapsedTime / m_ParticlesPhysicalProperties.lifetime));
+	m_NumActiveParticles = static_cast<int>(m_NumParticles * (m_ElapsedTime / m_ParticlesProperties.lifetime));
 	m_NumActiveParticles = (m_NumActiveParticles <= m_NumParticles ? m_NumActiveParticles : m_NumParticles);
 
 	for (int i = 0; i < m_NumActiveParticles; ++i)
@@ -30,9 +30,9 @@ void BoxScene::Update(float dt)
 		if (actualDt <= 0.0f)
 		{
 			actualDt = -actualDt;
-			particle.Reset(m_GenerationType, m_ParticlesPhysicalProperties.lifetime);
+			particle.Reset(m_GenerationType, m_ParticlesProperties.lifetime);
 		}
-		particle.UpdatePosition(actualDt, m_SolverMethod, m_ParticlesPhysicalProperties);
+		particle.Update(actualDt, m_ParticlesProperties);
 		CheckPlanes(particle, actualDt);
 		CheckSpheres(particle, actualDt);
 		CheckTriangles(particle, actualDt);

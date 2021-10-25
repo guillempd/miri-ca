@@ -45,11 +45,10 @@ protected:
 	// Resources
 	Ogre::MeshPtr m_PlaneMesh;
 	// Particles properties management
-	Particle::Properties m_ParticlesPhysicalProperties;
+	Particle::Properties m_ParticlesProperties;
 	// Ogre stuff
 	Ogre::SceneManager* m_SceneManager;
 	OgreBites::CameraMan* m_CameraMan;
-	Particle::SolverMethod m_SolverMethod;
 	Particle::GenerationType m_GenerationType;
 };
 

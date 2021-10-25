@@ -44,35 +44,6 @@ float Particle::UpdateLifetime(float dt)
 	return dt;
 }
 
-void Particle::UpdatePosition(float dt, SolverMethod method, const Properties& properties)
-{
-	m_PreviousPosition = m_CorrectedPreviousPosition;
-	Vector3 currentAcceleration = CurrentForce(properties) / properties.mass;
-	switch (method)
-	{
-	case SolverMethod::Euler:
-	{
-		SavePreviousPosition();
-		m_CurrentPosition += m_CurrentVelocity * dt;
-		m_CurrentVelocity += currentAcceleration * dt;
-	} break;
-	case SolverMethod::EulerSemi:
-	{
-		SavePreviousPosition();
-		m_CurrentVelocity += currentAcceleration * dt;
-		m_CurrentPosition += m_CurrentVelocity * dt;
-	} break;
-	case SolverMethod::Verlet:
-	{
-		Vector3 positionDelta = m_CurrentPosition - m_PreviousPosition;
-		SavePreviousPosition();
-		m_CurrentPosition += positionDelta + currentAcceleration * dt * dt;
-		m_CurrentVelocity = (m_CurrentPosition - m_PreviousPosition) / dt;
-	} break;
-	}
-	UpdateSceneNode();
-}
-
 void Particle::SavePreviousPosition()
 {
 	m_PreviousPosition = m_CurrentPosition;
@@ -106,9 +77,48 @@ void Particle::CheckAndResolveCollision(const Triangle& triangle, const Properti
 	}
 }
 
+void Particle::Set(const Vector3& position, const Vector3& velocity)
+{
+	m_CurrentPosition = position;
+	m_CurrentVelocity = velocity;
+	m_CurrentForce = Vector3::ZERO;
+	m_SceneNode->setVisible(true); // TODO: Move this to some other place
+	CorrectPreviousPosition(1.0f / 144.0f);
+	UpdateSceneNode();
+}
+
 void Particle::AddForce(const Vector3& force)
 {
 	m_CurrentForce += force;
+}
+
+void Particle::Update(float dt, const Properties& properties)
+{
+	m_PreviousPosition = m_CorrectedPreviousPosition;
+	Vector3 currentAcceleration = CurrentForce(properties) / properties.mass;
+	switch (properties.method)
+	{
+	case SolverMethod::Euler:
+	{
+		SavePreviousPosition();
+		m_CurrentPosition += m_CurrentVelocity * dt;
+		m_CurrentVelocity += currentAcceleration * dt;
+	} break;
+	case SolverMethod::EulerSemi:
+	{
+		SavePreviousPosition();
+		m_CurrentVelocity += currentAcceleration * dt;
+		m_CurrentPosition += m_CurrentVelocity * dt;
+	} break;
+	case SolverMethod::Verlet:
+	{
+		Vector3 positionDelta = m_CurrentPosition - m_PreviousPosition;
+		SavePreviousPosition();
+		m_CurrentPosition += positionDelta + currentAcceleration * dt * dt;
+		m_CurrentVelocity = (m_CurrentPosition - m_PreviousPosition) / dt;
+	} break;
+	}
+	UpdateSceneNode();
 }
 
 Vector3 Particle::CurrentForce(const Properties &properties)
