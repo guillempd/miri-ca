@@ -2,6 +2,7 @@
 
 #include "BoxScene.h"
 #include "RopeScene.h"
+#include "ClothScene.h"
 
 #include <imgui.h>
 
@@ -159,6 +160,10 @@ void ParticleSimulationApp::CreateScene()
     {
         m_Scene = new RopeScene(m_Materials, m_PlaneMesh);
     } break;
+    case SceneType::CLOTH:
+    {
+        m_Scene = new ClothScene(m_Materials, m_PlaneMesh);
+    }
     }
     m_Scene->Setup(m_SceneManager, getRenderWindow());
 
@@ -176,6 +181,7 @@ void ParticleSimulationApp::CreateSceneSelectionInterface()
     {
         ImGui::RadioButton("Box Scene", reinterpret_cast<int*>(&m_SceneType), static_cast<int>(SceneType::BOX));
         ImGui::RadioButton("Rope Scene", reinterpret_cast<int*>(&m_SceneType), static_cast<int>(SceneType::ROPE));
+        ImGui::RadioButton("Cloth Scene", reinterpret_cast<int*>(&m_SceneType), static_cast<int>(SceneType::CLOTH));
     }
     ImGui::End();
 

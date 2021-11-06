@@ -14,7 +14,7 @@ class ParticleSimulationApp
 	, public OgreBites::InputListener
 {
 public:
-	enum class SceneType {BOX, ROPE};
+	enum class SceneType {BOX, ROPE, CLOTH};
 public:
 	ParticleSimulationApp();
 	void setup() override;
