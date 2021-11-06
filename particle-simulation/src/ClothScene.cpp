@@ -9,8 +9,8 @@ ClothScene::ClothScene(std::vector<Ogre::MaterialPtr>& materials, Ogre::MeshPtr 
 	, m_ShearSprings()
 	, m_BendSprings()
 	, m_StretchProperties{50.0f, 0.1f, 0.1f}
-	, m_ShearProperties{25.0f, 0.1f, 0.2f}
-	, m_BendProperties()
+	, m_ShearProperties{0.0f, 0.0f, 0.2f}
+	, m_BendProperties{50.0f, 0.1f, 0.2f}
 {
 	// TODO: Correctly initialize springs constants
 }
@@ -98,6 +98,24 @@ void ClothScene::SetupEntities()
 	}
 
 	// Bend springs
+
+	// First column
+	for (int i = 2; i < m_ClothDimension; ++i)
+		m_BendSprings.emplace_back(*particles[i][0], *particles[i-2][0]);
+
+	// First row
+	for (int j = 2; j < m_ClothDimension; ++j)
+		m_BendSprings.emplace_back(*particles[0][j], *particles[0][j-2]);
+
+	// Rest
+	for (int i = 2; i < m_ClothDimension; ++i)
+	{
+		for (int j = 2; j < m_ClothDimension; ++j)
+		{
+			m_BendSprings.emplace_back(*particles[i][j], *particles[i][j-2]);
+			m_BendSprings.emplace_back(*particles[i][j], *particles[i-2][j]);
+		}
+	}
 
 	m_Planes.reserve(6);
 	CreatePlane(Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)); // FLOOR
