@@ -8,8 +8,8 @@ ClothScene::ClothScene(std::vector<Ogre::MaterialPtr>& materials, Ogre::MeshPtr 
 	, m_StretchSprings()
 	, m_ShearSprings()
 	, m_BendSprings()
-	, m_StretchProperties{ 75.0f, 0.15f, 0.1f }
-	, m_ShearProperties()
+	, m_StretchProperties{50.0f, 0.1f, 0.1f}
+	, m_ShearProperties{25.0f, 0.1f, 0.2f}
 	, m_BendProperties()
 {
 	// TODO: Correctly initialize springs constants
@@ -86,6 +86,16 @@ void ClothScene::SetupEntities()
 	}
 
 	// Shear springs
+	for (int i = 1; i < m_ClothDimension - 1; ++i)
+	{
+		for (int j = 1; j < m_ClothDimension - 1; ++j)
+		{
+			m_ShearSprings.emplace_back(*particles[i][j], *particles[i-1][j-1]);
+			m_ShearSprings.emplace_back(*particles[i][j], *particles[i-1][j+1]);
+			m_ShearSprings.emplace_back(*particles[i][j], *particles[i+1][j-1]);
+			m_ShearSprings.emplace_back(*particles[i][j], *particles[i+1][j+1]);
+		}
+	}
 
 	// Bend springs
 
