@@ -1,8 +1,11 @@
 #pragma once
 
 #include "Scene.h"
+#include "Spring.h"
 
 #include <Ogre.h>
+
+#include <vector>
 
 class ClothScene : public Scene
 {
@@ -16,5 +19,11 @@ private:
 	void CreateInterface();
 private:
 	int m_ClothDimension;
+	std::vector<Spring> m_StretchSprings;
+	std::vector<Spring> m_ShearSprings;
+	std::vector<Spring> m_BendSprings;
+	Spring::Properties m_StretchProperties;
+	Spring::Properties m_ShearProperties;
+	Spring::Properties m_BendProperties;
 };
 
