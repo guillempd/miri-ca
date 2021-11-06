@@ -1,8 +1,11 @@
 #pragma once
 
 #include "Scene.h"
+#include "Spring.h"
 
 #include <Ogre.h>
+
+#include <vector>
 
 class RopeScene : public Scene
 {
@@ -15,8 +18,7 @@ private:
 	void SetupEntities() override;
 	void CreateInterface();
 private:
-	float m_ElasticityK;
-	float m_DampingK;
 	int m_NumParticles;
-	float m_RestLength;
+	std::vector<Spring> m_Springs;
+	Spring::Properties m_SpringProperties;
 };
