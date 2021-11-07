@@ -18,6 +18,8 @@ void RopeScene::Update(float dt)
 
 	CreateInterface();
 
+	if (m_Paused) return;
+
 	// Compute forces
 	for (int i = 1; i < m_NumParticles; ++i)
 	{
@@ -77,4 +79,10 @@ void RopeScene::CreateInterface()
 		ImGui::DragFloat("RestLength", &m_SpringProperties.restLength, 0.001f, 0.0f, 0.1f, "%.3f", flags);
 	}
 	ImGui::End();
+}
+
+void RopeScene::ResetScene()
+{
+	Scene::ResetScene();
+	m_Springs.clear();
 }

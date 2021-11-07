@@ -168,6 +168,17 @@ void Scene::CheckTriangles(Particle& particle, float dt)
 	}
 }
 
+void Scene::TogglePauseState()
+{
+	m_Paused = !m_Paused;
+}
+
+void Scene::ResetSimulation()
+{
+	ResetScene();
+	SetupEntities();
+}
+
 // TODO: Maybe move this to another method not named update
 void Scene::Update(float dt)
 {
@@ -175,8 +186,13 @@ void Scene::Update(float dt)
 
 	ImGui::ShowMetricsWindow(); // For fps counter
 
-	if (ImGui::Begin("Particles Settings"))
+	if (ImGui::Begin("Scene Controls"))
 	{
+		if (ImGui::Button("Pause/Resume Simulation")) TogglePauseState();
+		if (ImGui::Button("Reset Simulation")) ResetSimulation();
+
+		ImGui::Separator();
+
 		ImGui::Text("Solver Method");
 		ImGui::RadioButton("Euler Original", reinterpret_cast<int*>(&m_ParticlesProperties.method), static_cast<int>(Particle::SolverMethod::Euler));
 		ImGui::RadioButton("Euler Semi Implicit", reinterpret_cast<int*>(&m_ParticlesProperties.method), static_cast<int>(Particle::SolverMethod::EulerSemi));
@@ -191,4 +207,14 @@ void Scene::Update(float dt)
 		ImGui::DragFloat3("Gravity", m_ParticlesProperties.gravity.ptr(), 0.05f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max(), "%.3f", flags);
 	}
 	ImGui::End();
+}
+
+void Scene::ResetScene()
+{
+	m_SceneManager->destroyAllEntities();
+	m_SceneManager->destroyAllManualObjects();
+	m_Particles.clear();
+	m_Planes.clear();
+	m_Spheres.clear();
+	m_Triangles.clear();
 }

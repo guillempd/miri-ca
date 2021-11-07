@@ -17,6 +17,7 @@ public:
 private:
 	void SetupEntities() override;
 	void CreateInterface();
+	void ResetScene() override;
 private:
 	int m_ClothDimension;
 	std::vector<Spring> m_StretchSprings;

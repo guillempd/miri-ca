@@ -20,6 +20,7 @@ public:
 	void Setup(Ogre::SceneManager* sceneManager, Ogre::RenderWindow* renderWindow);
 	virtual void Update(float dt);
 	OgreBites::CameraMan* GetCameraMan() { return m_CameraMan; }
+	virtual void ResetScene();
 protected:
 	void SetupCamera(Ogre::RenderWindow* renderWindow);
 	void SetupLighting();
@@ -31,7 +32,11 @@ protected:
 	void CheckPlanes(Particle& particle, float dt);
 	void CheckSpheres(Particle& particle, float dt);
 	void CheckTriangles(Particle& particle, float dt); // TODO: Consider making these a template Check<Collidable>
+	void TogglePauseState();
+	void ResetSimulation();
 protected:
+	// Scene management
+	bool m_Paused;
 	// Scene elements
 	std::vector<Particle> m_Particles;
 	std::vector<Plane> m_Planes;

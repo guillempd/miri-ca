@@ -17,6 +17,7 @@ public:
 private:
 	void SetupEntities() override;
 	void CreateInterface();
+	void ResetScene() override;
 private:
 	int m_NumParticles;
 	std::vector<Spring> m_Springs;

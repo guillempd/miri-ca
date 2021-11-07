@@ -20,6 +20,7 @@ private:
 	void SetupEntities() override;
 	void CreateInterface();
 	void ResetParticle(Particle& particle);
+	void ResetScene() override;
 private:
 	int m_NumParticles;
 	int m_NumActiveParticles;

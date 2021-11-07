@@ -21,6 +21,8 @@ void ClothScene::Update(float dt)
 
 	CreateInterface();
 
+	if (m_Paused) return;
+
 	// Apply forces
 	for (int i = 0; i < static_cast<int>(m_StretchSprings.size()); ++i)
 		m_StretchSprings[i].ApplyForces(m_StretchProperties);
@@ -155,4 +157,12 @@ void ClothScene::CreateInterface()
 		ImGui::DragFloat("Bend Rest Length", &m_BendProperties.restLength, 0.001f, 0.0f, 0.1f, "%.3f", flags);
 	}
 	ImGui::End();
+}
+
+void ClothScene::ResetScene()
+{
+	Scene::ResetScene();
+	m_StretchSprings.clear();
+	m_ShearSprings.clear();
+	m_BendSprings.clear();
 }

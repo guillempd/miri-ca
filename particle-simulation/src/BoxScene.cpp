@@ -40,11 +40,21 @@ void BoxScene::ResetParticle(Particle& particle)
 	particle.Set(initialPosition, initialVelocity);
 }
 
+void BoxScene::ResetScene()
+{
+	Scene::ResetScene();
+	m_ElapsedTime = 0.0f;
+	for (int i = 0; i < m_NumParticles; ++i)
+		m_ParticlesLifetimes[i] = 0.0f;
+}
+
 void BoxScene::Update(float dt)
 {
 	Scene::Update(dt);
 
 	CreateInterface();
+
+	if (m_Paused) return;
 
 	m_ElapsedTime += dt;
 	m_NumActiveParticles = static_cast<int>(m_NumParticles * (m_ElapsedTime / s_ParticlesLifetime));
