@@ -8,9 +8,9 @@ ClothScene::ClothScene(std::vector<Ogre::MaterialPtr>& materials, Ogre::MeshPtr 
 	, m_StretchSprings()
 	, m_ShearSprings()
 	, m_BendSprings()
-	, m_StretchProperties{50.0f, 0.1f, 0.1f}
-	, m_ShearProperties{0.0f, 0.0f, 0.2f}
-	, m_BendProperties{50.0f, 0.1f, 0.2f}
+	, m_StretchProperties{25.0f, 0.1f, 0.1f}
+	, m_ShearProperties{10.0f, 0.05f, 0.1414f}
+	, m_BendProperties{10.0f, 0.05f, 0.2f}
 	, m_InitialPositionOffset{0.0f, 0.0f}
 {
 	// TODO: Correctly initialize springs constants
@@ -143,19 +143,19 @@ void ClothScene::CreateInterface()
 
 		ImGui::Separator();
 
-		ImGui::DragFloat("Stretch Stiffness Constant", &m_StretchProperties.stiffnessK, 0.01f, 0.0f, std::numeric_limits<float>::max(), "%.3f", flags);
+		ImGui::DragFloat("Stretch Stiffness Constant", &m_StretchProperties.stiffnessK, 0.1f, 0.0f, std::numeric_limits<float>::max(), "%.3f", flags);
 		ImGui::DragFloat("Stretch Damping Constant", &m_StretchProperties.dampingK, 0.01f, 0.0f, std::numeric_limits<float>::max(), "%.3f", flags);
 		ImGui::DragFloat("Stretch Rest Length", &m_StretchProperties.restLength, 0.001f, 0.0f, 0.5f, "%.3f", flags);
 
 		ImGui::Separator();
 
-		ImGui::DragFloat("Shear Stiffness Constant", &m_ShearProperties.stiffnessK, 0.01f, 0.0f, std::numeric_limits<float>::max(), "%.3f", flags);
+		ImGui::DragFloat("Shear Stiffness Constant", &m_ShearProperties.stiffnessK, 0.1f, 0.0f, std::numeric_limits<float>::max(), "%.3f", flags);
 		ImGui::DragFloat("Shear Damping Constant", &m_ShearProperties.dampingK, 0.01f, 0.0f, std::numeric_limits<float>::max(), "%.3f", flags);
 		ImGui::DragFloat("Shear Rest Length", &m_ShearProperties.restLength, 0.001f, 0.0f, 0.5f, "%.3f", flags);
 
 		ImGui::Separator();
 
-		ImGui::DragFloat("Bend Stiffness Constant", &m_BendProperties.stiffnessK, 0.01f, 0.0f, std::numeric_limits<float>::max(), "%.3f", flags);
+		ImGui::DragFloat("Bend Stiffness Constant", &m_BendProperties.stiffnessK, 0.1f, 0.0f, std::numeric_limits<float>::max(), "%.3f", flags);
 		ImGui::DragFloat("Bend Damping Constant", &m_BendProperties.dampingK, 0.01f, 0.0f, std::numeric_limits<float>::max(), "%.3f", flags);
 		ImGui::DragFloat("Bend Rest Length", &m_BendProperties.restLength, 0.001f, 0.0f, 0.5f, "%.3f", flags);
 	}

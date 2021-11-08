@@ -16,7 +16,7 @@ Scene::Scene(std::vector<Ogre::MaterialPtr>& materials, Ogre::MeshPtr planeMesh)
 	, m_Rng()
 	, m_UniformMaterialIndex(0, m_Materials.size()-1)
 	, m_PlaneMesh(planeMesh)
-	, m_ParticlesProperties{Vector3(0.0f, -9.8f, 0.0f), 0.01f, 0.5f, 0.5f, Particle::SolverMethod::Verlet}
+	, m_ParticlesProperties{Vector3(0.0f, -9.8f, 0.0f), 0.01f, 0.1f, 0.25f, Particle::SolverMethod::Verlet}
 	, m_SceneManager(nullptr)
 	, m_CameraMan(nullptr)
 {

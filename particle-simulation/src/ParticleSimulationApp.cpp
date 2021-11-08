@@ -18,7 +18,7 @@ using Ogre::Vector3;
 
 ParticleSimulationApp::ParticleSimulationApp()
     : OgreBites::ApplicationContext("ParticleSimulationApp")
-    , m_SceneType(SceneType::ROPE)
+    , m_SceneType(SceneType::CLOTH)
     , m_Scene(nullptr)
     , m_InputListenerChain(nullptr)
 {
