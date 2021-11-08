@@ -12,6 +12,7 @@ ClothScene::ClothScene(std::vector<Ogre::MaterialPtr>& materials, Ogre::MeshPtr 
 	, m_ShearProperties{10.0f, 0.05f, 0.1414f}
 	, m_BendProperties{10.0f, 0.05f, 0.2f}
 	, m_InitialPositionOffset{0.0f, 0.0f}
+	, m_FixedEdge(false)
 {
 	// TODO: Correctly initialize springs constants
 }
@@ -35,7 +36,7 @@ void ClothScene::Update(float dt)
 		m_BendSprings[i].ApplyForces(m_BendProperties);
 
 	// Update particles
-	for (int i = 0; i < m_ClothDimension; ++i)
+	for (int i = 1; i < m_ClothDimension; ++i)
 	{
 		for (int j = 0; j < m_ClothDimension; ++j)
 		{
@@ -46,6 +47,18 @@ void ClothScene::Update(float dt)
 			CheckSpheres(particle, dt);
 			CheckTriangles(particle, dt);
 		}
+	}
+
+	if (m_FixedEdge) return;
+
+	for (int j = 0; j < m_ClothDimension; ++j)
+	{
+		Particle& particle = m_Particles[0*m_ClothDimension + j];
+
+		particle.Update(m_ParticlesProperties, dt);
+		CheckPlanes(particle, dt);
+		CheckSpheres(particle, dt);
+		CheckTriangles(particle, dt);
 	}
 }
 
@@ -158,6 +171,10 @@ void ClothScene::CreateInterface()
 		ImGui::DragFloat("Bend Stiffness Constant", &m_BendProperties.stiffnessK, 0.1f, 0.0f, std::numeric_limits<float>::max(), "%.3f", flags);
 		ImGui::DragFloat("Bend Damping Constant", &m_BendProperties.dampingK, 0.01f, 0.0f, std::numeric_limits<float>::max(), "%.3f", flags);
 		ImGui::DragFloat("Bend Rest Length", &m_BendProperties.restLength, 0.001f, 0.0f, 0.5f, "%.3f", flags);
+
+		ImGui::Separator();
+
+		ImGui::Checkbox("Fix Edge", &m_FixedEdge);
 	}
 	ImGui::End();
 }

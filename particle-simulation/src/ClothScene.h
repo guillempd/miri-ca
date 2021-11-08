@@ -27,5 +27,6 @@ private:
 	Spring::Properties m_ShearProperties;
 	Spring::Properties m_BendProperties;
 	float m_InitialPositionOffset[2];
+	bool m_FixedEdge;
 };
 
