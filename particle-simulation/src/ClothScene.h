@@ -26,5 +26,6 @@ private:
 	Spring::Properties m_StretchProperties;
 	Spring::Properties m_ShearProperties;
 	Spring::Properties m_BendProperties;
+	float m_InitialPositionOffset[2];
 };
 

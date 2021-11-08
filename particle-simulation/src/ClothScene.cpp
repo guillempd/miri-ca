@@ -11,6 +11,7 @@ ClothScene::ClothScene(std::vector<Ogre::MaterialPtr>& materials, Ogre::MeshPtr 
 	, m_StretchProperties{50.0f, 0.1f, 0.1f}
 	, m_ShearProperties{0.0f, 0.0f, 0.2f}
 	, m_BendProperties{50.0f, 0.1f, 0.2f}
+	, m_InitialPositionOffset{0.0f, 0.0f}
 {
 	// TODO: Correctly initialize springs constants
 }
@@ -60,7 +61,8 @@ void ClothScene::SetupEntities()
 	{
 		for (int j = 0; j < m_ClothDimension; ++j)
 		{
-			Vector3 initialPosition = Vector3(static_cast<float>(i)/m_ClothDimension - 0.5f, 0.75f, static_cast<float>(j)/m_ClothDimension - 0.5f);
+			float centerOffset = static_cast<float>(m_ClothDimension - 1) / (2 * m_ClothDimension);
+			Vector3 initialPosition = Vector3(static_cast<float>(i)/m_ClothDimension - centerOffset + m_InitialPositionOffset[0], 0.75f, static_cast<float>(j)/m_ClothDimension - centerOffset + m_InitialPositionOffset[1]);
 			Particle &particle = CreateParticle();
 			particle.Set(initialPosition, Vector3::ZERO);
 			particles[i][j] = &particle;
@@ -137,24 +139,25 @@ void ClothScene::CreateInterface()
 	{
 		ImGuiSliderFlags flags = ImGuiSliderFlags_AlwaysClamp;
 
-		ImGui::Text("Stretch Springs");
+		ImGui::DragFloat2("Initial Position Offset", m_InitialPositionOffset, 0.01f, -0.5f, 0.5f, "%.3f", flags);
+
+		ImGui::Separator();
+
 		ImGui::DragFloat("Stretch Stiffness Constant", &m_StretchProperties.stiffnessK, 0.01f, 0.0f, std::numeric_limits<float>::max(), "%.3f", flags);
 		ImGui::DragFloat("Stretch Damping Constant", &m_StretchProperties.dampingK, 0.01f, 0.0f, std::numeric_limits<float>::max(), "%.3f", flags);
-		ImGui::DragFloat("Stretch Rest Length", &m_StretchProperties.restLength, 0.001f, 0.0f, 0.1f, "%.3f", flags);
+		ImGui::DragFloat("Stretch Rest Length", &m_StretchProperties.restLength, 0.001f, 0.0f, 0.5f, "%.3f", flags);
 
 		ImGui::Separator();
 
-		ImGui::Text("Shear Springs");
 		ImGui::DragFloat("Shear Stiffness Constant", &m_ShearProperties.stiffnessK, 0.01f, 0.0f, std::numeric_limits<float>::max(), "%.3f", flags);
 		ImGui::DragFloat("Shear Damping Constant", &m_ShearProperties.dampingK, 0.01f, 0.0f, std::numeric_limits<float>::max(), "%.3f", flags);
-		ImGui::DragFloat("Shear Rest Length", &m_ShearProperties.restLength, 0.001f, 0.0f, 0.1f, "%.3f", flags);
+		ImGui::DragFloat("Shear Rest Length", &m_ShearProperties.restLength, 0.001f, 0.0f, 0.5f, "%.3f", flags);
 
 		ImGui::Separator();
 
-		ImGui::Text("Bend Springs");
 		ImGui::DragFloat("Bend Stiffness Constant", &m_BendProperties.stiffnessK, 0.01f, 0.0f, std::numeric_limits<float>::max(), "%.3f", flags);
 		ImGui::DragFloat("Bend Damping Constant", &m_BendProperties.dampingK, 0.01f, 0.0f, std::numeric_limits<float>::max(), "%.3f", flags);
-		ImGui::DragFloat("Bend Rest Length", &m_BendProperties.restLength, 0.001f, 0.0f, 0.1f, "%.3f", flags);
+		ImGui::DragFloat("Bend Rest Length", &m_BendProperties.restLength, 0.001f, 0.0f, 0.5f, "%.3f", flags);
 	}
 	ImGui::End();
 }
